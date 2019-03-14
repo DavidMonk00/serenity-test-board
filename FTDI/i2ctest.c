@@ -1,7 +1,6 @@
+
 /*
-
    !!! YOU MUST RUN AS ROOT !!!
-
  */
 
 /* C */
@@ -79,6 +78,7 @@ const char *MUX2_LABLES[8] = { "X0_POWER_MGTVCCAUC_N        ",
                                "SERVICES_POWER_STANDBY_+3.3V"
 };
 
+
 const char *MUX3_LABLES[8] = { "Not Used                    ",
                                "+12_SCALED                  ",
                                "X0_POWER_+1.8V              ",
@@ -89,11 +89,12 @@ const char *MUX3_LABLES[8] = { "Not Used                    ",
                                "X0_POWER_MGTAVTT_S          "
 };
 
-
 /* serenity I2C */
+
+
 int I2Cwrite( struct mpsse_context *i2c, uint32_t addr, uint32_t data) {
 
-    // printf(" Wring to addr 0x%x: 0x%x\n", addr&0xff, data);
+//    printf(" Wring to addr 0x%x: 0x%x\n", addr&0xff, data);
     Start( i2c );                      // start bit
 
     char wAddr = (addr|I2C_WR);
@@ -104,7 +105,7 @@ int I2Cwrite( struct mpsse_context *i2c, uint32_t addr, uint32_t data) {
         Write( i2c, &d, 1 );
 
         if( GetAck( i2c ) == ACK ) {
-            // printf("Writing done.\n");
+//            printf("Writing done.\n");
         } else {
             printf("ERROR >>> I2Cwrite: ACK not received.\n");
             Stop( i2c );
@@ -113,7 +114,7 @@ int I2Cwrite( struct mpsse_context *i2c, uint32_t addr, uint32_t data) {
     }
     else {
         printf("ERROR >>> I2Cwrite: ACK not received.\n");
-        // printf("ERROR ACK not received.\n");
+//        printf("ERROR ACK not received.\n");
         Stop( i2c );
         return -1;
     }
@@ -123,6 +124,7 @@ int I2Cwrite( struct mpsse_context *i2c, uint32_t addr, uint32_t data) {
     return 0;
 
 }
+
 
 
 int I2Cread( struct mpsse_context *i2c, uint32_t addr, uint32_t *data, uint32_t ndata ) {
@@ -136,16 +138,14 @@ int I2Cread( struct mpsse_context *i2c, uint32_t addr, uint32_t *data, uint32_t 
     if( GetAck(i2c) == ACK ) {
         int idata=0;
         for(; idata<ndata; idata++) {
+
+            if( idata<(ndata-1) ) // send Nack if is the lat read
+                SendNacks( i2c );
+
             rData = Read( i2c, 1 );
             data[idata] = *rData;
-            // printf( " Reading from addr 0x%x: 0x%x\n", addr&0xff, (*rData)&0xff );
-            if( idata<(ndata-1) )
                 SendAcks( i2c );
         }
-
-        SendNacks( i2c );
-        /* Read in one dummy byte, with a NACK */
-        //Read(i2c, 1);
 
     }
     else{
@@ -169,9 +169,9 @@ float readADC( struct mpsse_context *i2c ) {
     uint32_t result = (data[0] & 0xff) << 8;
     result = result | (data[1] & 0xff);
 
-    // printf("%x\n", data[0]&0xff);
-    // printf("%x\n", data[1]&0xff);
-    // printf("%d\n", result);
+//    printf("%x\n", data[0]&0xff);
+//    printf("%x\n", data[1]&0xff);
+//    printf("%d\n", result);
 
     return ( ((float)result) * ADC_REF_V ) / powf(2,16);
 
@@ -264,7 +264,7 @@ int loopOverPP( struct mpsse_context *i2c, int nPoints, char *dataBuf ) {
     // gnd mux must be changed accordingly
 
     int imux=0;
-    float *data = (float*)malloc(nPoints);
+    float *data = malloc(nPoints);
 
     sprintf( dataBuf, "%d,", nPoints );
 
@@ -320,7 +320,7 @@ int loopOverPP( struct mpsse_context *i2c, int nPoints, char *dataBuf ) {
         }
     }
 
-    // free(data);
+//    free(data);
 
     return 0;
 
@@ -408,9 +408,7 @@ int main(int argc, char** argv) {
 
     /* I2C interface */
     struct mpsse_context *i2c = NULL;
-    //i2c = MPSSE( I2C, ONE_HUNDRED_KHZ, MSB );
-    i2c = OpenIndex(0x0403, 0x6010, I2C, FOUR_HUNDRED_KHZ, MSB,
-    	            IFACE_A, NULL, NULL, 0);
+    i2c = MPSSE( I2C, FOUR_HUNDRED_KHZ, MSB );
 
     if( i2c != NULL && i2c->open ) {
 
