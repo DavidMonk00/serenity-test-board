@@ -9,6 +9,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <time.h>
+#include <unistd.h>
 
 #include "consts.h"
 #include "I2CIO.h"
