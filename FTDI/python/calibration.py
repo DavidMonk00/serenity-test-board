@@ -44,7 +44,7 @@ CHANNEL_LIST = [
 ]
 
 
-class CallibrationBoard(Board):
+class CalibrationBoard(Board):
     def measure(self, input_voltage, connected_pins):
         self.input_voltage = input_voltage
         # THIS IS NOT SECURE OR PORTABLE
@@ -63,15 +63,15 @@ class CallibrationBoard(Board):
         mean = self.df[CHANNEL_LIST[0][0]].describe()['mean']
         std = self.df[CHANNEL_LIST[0][0]].describe()['std']
         datestring = datetime.date.today().strftime("%Y%m%d")
-        with open(path+'/data/callibration/'+datestring+'.csv', 'a') as f:
+        with open(path+'/data/calibration/'+datestring+'.csv', 'a') as f:
             string = "%0.4f,%0.4f,%0.4f\n" % (self.input_voltage, mean, std)
             f.write(string)
 
 
-def runCallibration():
-    c_board = CallibrationBoard(0)
+def runCalibration():
+    c_board = CalibrationBoard(0)
     results = c_board.measure(3.0, CHANNEL_LIST[0]+CHANNEL_LIST[1][3:])
 
 
 if __name__ == '__main__':
-    runCallibration()
+    runCalibration()

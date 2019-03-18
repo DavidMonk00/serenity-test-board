@@ -35,14 +35,14 @@ int loopOverPP( struct mpsse_context *i2c, int nPoints, char *dataBuf ) {
     for( ; imux<4; imux++ ) {
         int ich=0;
         for( ; ich<8; ich++ ) {
-            int confRes = configure( i2c, 0, imux, ich );
+            int confRes = configure( i2c, GND_MUX[imux][ich], imux, ich );
             if( confRes < 0 ) {
                 free(data);
                 return -1;
             }
 
             // Add sleep to llow voltage to settle to value
-            usleep(100e3);
+            usleep(500e3);
 
             int ipoint=0;
             float ADCmean=0, ADCrms=0;
