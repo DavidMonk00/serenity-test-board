@@ -42,7 +42,7 @@ int loopOverPP( struct mpsse_context *i2c, int nPoints, char *dataBuf ) {
             }
 
             // Add sleep to llow voltage to settle to value
-            usleep(500e3);
+            usleep(100e3);
 
             int ipoint=0;
             float ADCmean=0, ADCrms=0;
@@ -91,6 +91,7 @@ int main(int argc, char** argv) {
     int  ndata = 1; // numer of bites to read
     char addr = 0x00;
     int port = 1025; // port for external communication
+    int npoints = 8;
 
 
     /* options */
@@ -105,11 +106,12 @@ int main(int argc, char** argv) {
         {"adc"           , required_argument,  0, 'c'},
         {"loop"          , required_argument,  0, 'l'},
         {"transmit"      , required_argument,  0, 't'},
+        {"data-points"   , required_argument,  0, 'N'},
         {0,0,0,0}
     };
 
     int optIndex = 0;
-    while ( (opt = getopt_long (argc, argv, "hrwa:d:n:clt:", longOptions, &optIndex) ) != -1 ) {
+    while ( (opt = getopt_long (argc, argv, "hrwa:d:n:clt:N:", longOptions, &optIndex) ) != -1 ) {
 
         switch (opt)
         {
@@ -124,6 +126,7 @@ int main(int argc, char** argv) {
             printf( "c(--adc   ) : \t returns the ADC conversion in V.\n" );
             printf( "l(--loop  ) : \t returns all the voltages on each mux.\n" );
             printf( "t(--transmit): <port> \t will continuosly transmit data to <port>.\n" );
+            printf( "N(--data-points): <npoints> \t number of points to loop through for each reading.\n" );
             return 0;
             break;
         case 'r':
@@ -151,6 +154,9 @@ int main(int argc, char** argv) {
             port = atoi(optarg);
             loopFlag = 1;
             transmitFlag = 1;
+            break;
+        case 'N':
+            npoints = atoi(optarg);
             break;
         default:
             return 0;
@@ -206,7 +212,7 @@ int main(int argc, char** argv) {
         if( loopFlag == 1 ) {
             printf("All voltages on Serenity (in Volt):\n");
             char buffer[1000000];
-            loopOverPP( i2c, 8, buffer );
+            loopOverPP( i2c, npoints, buffer );
             writeToFile(buffer);
 
             if( transmitFlag==1 ) {
