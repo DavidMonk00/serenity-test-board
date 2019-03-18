@@ -18,7 +18,7 @@ const uint32_t I2C_MUX_CH7 = 0x80;
 /* ADC */
 const uint32_t ADC_ADDR  = 0x60;
 
-const float ADC_REF_V = 4.096; // adc reference in volt
+const float ADC_REF_V = 4.116; // adc reference in volt
 
 /* analog MUXs */
 

@@ -18,7 +18,7 @@ float readADC( struct mpsse_context *i2c ) {
     // printf("%x\n", data[1]&0xff);
     // printf("%d\n", result);
 
-    return ( ((float)result) ) / powf(2,16);
+    return ( ((float)result) * ADC_REF_V ) / powf(2,16);
 
 }
 
@@ -42,7 +42,7 @@ int loopOverPP( struct mpsse_context *i2c, int nPoints, char *dataBuf ) {
             }
 
             // Add sleep to llow voltage to settle to value
-            usleep(500e3);
+            usleep(100e3);
 
             int ipoint=0;
             float ADCmean=0, ADCrms=0;

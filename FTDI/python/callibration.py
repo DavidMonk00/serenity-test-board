@@ -3,9 +3,10 @@ from glob import glob
 import numpy as np
 from data import Data
 from board import Board
+import datetime
 
 
-path = '/home/dmonk/serenity-test-board/FTDI/'
+path = '/home/dmonk/serenity-test-board/FTDI'
 
 CHANNEL_LIST = [
     ['X1_POWER_MGTVCCAUX_N',
@@ -45,24 +46,31 @@ CHANNEL_LIST = [
 
 class CallibrationBoard(Board):
     def measure(self, input_voltage, connected_pins):
-        # TODO: Make this command dynamic
+        self.input_voltage = input_voltage
         # THIS IS NOT SECURE OR PORTABLE
-        stdout = subprocess.check_output(
-            ['sudo', '-S',
-             'LD_LIBRARY_PATH=/usr/local/lib/:$LD_LIBRARY_PATH',
-             '/home/dmonk/serenity-test-board/FTDI/bin/main', '-l',
-             '<', path+'psswd']
+        subprocess.call(
+            [path+'/measure_all.sh']
         )
-        print(stdout)
-        files = glob(path + 'data/*.dat')
+        files = glob(path + '/data/*.dat')
+        print(files[-1])
         data = Data(self.ID, files[-1])
-        return data.getDataFrame()[connected_pins]
+        self.df = data.getDataFrame()[connected_pins]
+        return self.df
+
+    def writeResults(self):
+        if not hasattr(self, 'df'):
+            self.measure()
+        mean = self.df[CHANNEL_LIST[0][0]].describe()['mean']
+        std = self.df[CHANNEL_LIST[0][0]].describe()['std']
+        datestring = datetime.date.today().strftime("%Y%m%d")
+        with open(path+'/data/callibration/'+datestring+'.csv', 'a') as f:
+            string = "%0.4f,%0.4f,%0.4f\n" % (self.input_voltage, mean, std)
+            f.write(string)
 
 
 def runCallibration():
     c_board = CallibrationBoard(0)
     results = c_board.measure(3.0, CHANNEL_LIST[0]+CHANNEL_LIST[1][3:])
-    print(results.describe())
 
 
 if __name__ == '__main__':
