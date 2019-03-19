@@ -40,7 +40,6 @@ int loopOverChannels(struct mpsse_context *i2c, int nPoints, char* dataBuf) {
           sprintf(dataBuf, "%s%f,", dataBuf,
                   data[i].readings[j]);
       }
-
     }
 }
 
