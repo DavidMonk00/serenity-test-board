@@ -23,12 +23,25 @@ float readADC( struct mpsse_context *i2c ) {
 }
 
 
-int loopOverPP( struct mpsse_context *i2c, int nPoints, char *dataBuf ) {
+int loopOverChannels(struct mpsse_context *i2c, int nPoints, char* dataBuf) {
+    struct channel_reading data[NUMBER_OF_CHANNELS];
+    int i;
+    for (i = 0; i < NUMBER_OF_CHANNELS; i++) {
+      data[i].label = MUX_LABLES[i / 8][i % 8];
+      data[i].readings = (float*)malloc(nPoints*sizeof(float));
+    }
+    loopOverPP(i2c, nPoints, dataBuf, data, 0);
+    printf("%s%f\n", data[0].label, data[0].mean);
+}
+
+
+int loopOverPP( struct mpsse_context *i2c, int nPoints, char *dataBuf,
+                struct channel_reading* dat, int loop_index) {
 
     // gnd mux must be changed accordingly
 
     int imux=0;
-    float *data = (float*)malloc(nPoints);
+    // float *data = (float*)malloc(nPoints*sizeof(float));
 
     sprintf( dataBuf, "%d,", nPoints );
     //printf("%s\n", "Starting loop over muxes...");
@@ -37,34 +50,42 @@ int loopOverPP( struct mpsse_context *i2c, int nPoints, char *dataBuf ) {
         for( ; ich<8; ich++ ) {
             int confRes = configure( i2c, GND_MUX[imux][ich], imux, ich );
             if( confRes < 0 ) {
-                free(data);
+                // free(data);
                 return -1;
             }
 
             // Add sleep to llow voltage to settle to value
-            usleep(100e3);
+            usleep(50e3);
 
-            int ipoint=0;
+            int ipoint = loop_index * 8;
             float ADCmean=0, ADCrms=0;
-            for(; ipoint<nPoints ; ipoint++) {
-                data[ipoint] = readADC( i2c );
-                ADCmean += data[ipoint];
+            while (ipoint < nPoints) {
+                float reading = readADC(i2c);
+                // data[ipoint] = readADC( i2c );
+                dat[8*imux + ich].readings[ipoint] = reading;
+                ADCmean += reading;
+                ipoint++;
+                usleep(20);
             }
-            ADCmean = ADCmean/nPoints;
+            dat[8*imux + ich].mean = ADCmean/nPoints;
 
             for( ipoint=0 ; ipoint<nPoints ; ipoint++ ) {
-                ADCrms  += pow( data[ipoint]-ADCmean, 2 );
+                // ADCrms  += pow( data[ipoint]-ADCmean, 2 );
+                ADCrms  += pow(dat[8*imux + ich].readings[ipoint] - dat[8*imux + ich].mean, 2);
             }
-            ADCrms = sqrt(ADCrms/nPoints);
+            dat[8*imux + ich].rms = sqrt(ADCrms/nPoints);
 
             printf("%s\t", MUX_LABLES[imux][ich] );
             sprintf( dataBuf, "%s%s,", dataBuf, MUX_LABLES[imux][ich] );
-            printf( "MUX %d \t CH %d \t ADC_RD %f ( %f )\n", imux, ich, ADCmean, ADCrms );
+            printf("MUX %d \t CH %d \t ADC_RD %f ( %f )\n",
+                   imux, ich, dat[8*imux + ich].mean,
+                   dat[8*imux + ich].rms);
 
             ipoint=0;
             for(; ipoint<nPoints ; ipoint++) {
-                data[ipoint];
-                sprintf( dataBuf, "%s%f,", dataBuf, data[ipoint] );
+                // data[ipoint];
+                sprintf(dataBuf, "%s%f,", dataBuf,
+                        dat[8*imux + ich].readings[ipoint] );
             }
 
 
@@ -212,7 +233,8 @@ int main(int argc, char** argv) {
         if( loopFlag == 1 ) {
             printf("All voltages on Serenity (in Volt):\n");
             char buffer[1000000];
-            loopOverPP( i2c, npoints, buffer );
+            loopOverChannels(i2c, npoints, buffer);
+            printf("%s\n", buffer);
             writeToFile(buffer);
 
             if( transmitFlag==1 ) {

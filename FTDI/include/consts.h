@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 
+#define NUMBER_OF_CHANNELS 32
+
 extern const uint32_t I2C_WR;
 extern const uint32_t I2C_RD;
 
@@ -38,3 +40,10 @@ extern const uint32_t MUX_CH[8];
 extern const char *MUX_LABLES[4][8];
 
 extern const int GND_MUX[4][8];
+
+struct channel_reading {
+  const char* label;
+  float* readings;
+  float mean;
+  float rms;
+};
