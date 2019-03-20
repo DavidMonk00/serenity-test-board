@@ -50,7 +50,7 @@ int singleReading(struct mpsse_context *i2c, char* mux_label, int nPoints) {
         for(ich = 0; ich < 8; ich++) {
             if (strcmp(mux_label, MUX_LABLES[imux][ich]) == 0) {
                 printf("Selecting MUX %d CHANNEL %d LABEL %s...\n", imux, ich, mux_label);
-                int confRes = configure( i2c, GND_MUX[imux][ich], imux, ich );
+                int confRes = config( i2c, GND_MUX[imux][ich], imux, ich );
                 if( confRes < 0 ) {
                     return -1;
                 }
@@ -62,6 +62,10 @@ int singleReading(struct mpsse_context *i2c, char* mux_label, int nPoints) {
                     float reading = readADC(i2c);
                     data[ipoint] = reading;
                     ADCmean += reading;
+                    printf("r: %f\n", reading);
+                    if (ipoint % 5 == 5) {
+                      printf("\n");
+                    }
                     ipoint++;
                     usleep(20);
                 }
@@ -84,7 +88,7 @@ int loopOverPP( struct mpsse_context *i2c, int nPoints,
     for( ; imux<4; imux++ ) {
         int ich=0;
         for( ; ich<8; ich++ ) {
-            int confRes = configure( i2c, GND_MUX[imux][ich], imux, ich );
+            int confRes = config( i2c, GND_MUX[imux][ich], imux, ich );
             if( confRes < 0 ) {
                 return -1;
             }
@@ -240,7 +244,7 @@ int main(int argc, char** argv) {
                 printf("Reading operation done, date read:\n");
                 int idata=0;
                 for(; idata<ndata; idata++) {
-                    printf("0x%lx\n", rData[idata]);
+                    printf("0x%dx\n", rData[idata]);
                 }
                 free(rData);
             }
@@ -281,7 +285,8 @@ int main(int argc, char** argv) {
                 sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
                 if (sockfd < 0)
-                    error("ERROR opening socket");
+                    return -1;
+                    // error("ERROR opening socket");
                 server = gethostbyname( hostname );
 
                 if (server == NULL) {
@@ -297,13 +302,15 @@ int main(int argc, char** argv) {
                 serv_addr.sin_port = htons(portno);
 
                 if ( connect( sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr) ) < 0) {
-                    error("ERROR connecting");
+                  return -1;
+                  // error("ERROR connecting");
 
                 }
 
                 n = write( sockfd, buffer, strlen(buffer) );
                 if ( n < 0 )
-                    error("ERROR writing to socket");
+                    return -1;
+                    // error("ERROR writing to socket");
 
                 close( sockfd );
 

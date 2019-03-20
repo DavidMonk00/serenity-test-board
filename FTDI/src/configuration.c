@@ -67,7 +67,7 @@ int select_MUX_ANALOG_channel( struct mpsse_context *i2c, uint32_t muxID, uint32
 }
 
 
-int configure( struct mpsse_context *i2c, int gndMuxCH, int analogMuxId, int analogMuxCh ) {
+int config( struct mpsse_context *i2c, int gndMuxCH, int analogMuxId, int analogMuxCh ) {
 
     if( select_MUX_GND_channel( i2c, gndMuxCH ) < 0 ) {
         printf("ERROR configuring the GND mux\n");
