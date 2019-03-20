@@ -14,10 +14,6 @@ float readADC( struct mpsse_context *i2c ) {
     uint32_t result = (data[0] & 0xff) << 8;
     result = result | (data[1] & 0xff);
 
-    // printf("%x\n", data[0]&0xff);
-    // printf("%x\n", data[1]&0xff);
-    // printf("%d\n", result);
-
     return (((float)result) * ADC_REF_V) / powf(2,16);
 
 }
@@ -256,8 +252,12 @@ int main(int argc, char** argv) {
 
         /* read ADC */
         if( readADCflag == 1 ) {
-            float adcRes = readADC( i2c );
-            printf("ADC reading: %f V\n", adcRes);
+            int i;
+            for (i = 0; i < npoints; i++) {
+                float adcRes = readADC( i2c );
+                printf("ADC reading: %f V\n", adcRes);
+            }
+
         }
 
         if (singleReadFlag == 1) {
@@ -326,7 +326,7 @@ int main(int argc, char** argv) {
 
     }
 
-printf("ERROR >>> Failed to initialize MPSSE: %s\n", ErrorString(i2c));
+    printf("ERROR >>> Failed to initialize MPSSE: %s\n", ErrorString(i2c));
     printf("fail\n");
 
     return 0;
