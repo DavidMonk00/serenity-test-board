@@ -38,6 +38,7 @@ extern const uint32_t MUX_EN;
 extern const uint32_t MUX_CH[8];
 
 extern const char *MUX_LABLES[4][8];
+extern const char *MUX_DISPLAY_LABLES[4][8];
 
 extern const int GND_MUX[4][8];
 

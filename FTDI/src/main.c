@@ -18,7 +18,7 @@ float readADC( struct mpsse_context *i2c ) {
     // printf("%x\n", data[1]&0xff);
     // printf("%d\n", result);
 
-    return (((float)result)) / powf(2,16);
+    return (((float)result) * ADC_REF_V) / powf(2,16);
 
 }
 
@@ -43,6 +43,39 @@ int loopOverChannels(struct mpsse_context *i2c, int nPoints, char* dataBuf) {
     }
 }
 
+int singleReading(struct mpsse_context *i2c, char* mux_label, int nPoints) {
+    float* data = (float*)malloc(nPoints*sizeof(float));
+    int imux, ich;
+    for(imux = 0; imux < 4; imux++) {
+        for(ich = 0; ich < 8; ich++) {
+            if (strcmp(mux_label, MUX_LABLES[imux][ich]) == 0) {
+                printf("Selecting MUX %d CHANNEL %d LABEL %s...\n", imux, ich, mux_label);
+                int confRes = configure( i2c, GND_MUX[imux][ich], imux, ich );
+                if( confRes < 0 ) {
+                    return -1;
+                }
+                // Add sleep to llow voltage to settle to value
+                usleep(50e3);
+                int ipoint = 0;
+                float ADCmean=0, ADCrms=0;
+                while (ipoint < nPoints) {
+                    float reading = readADC(i2c);
+                    data[ipoint] = reading;
+                    ADCmean += reading;
+                    ipoint++;
+                    usleep(20);
+                }
+                ADCmean = ADCmean/nPoints;
+                for(ipoint = 0; ipoint < nPoints; ipoint++) {
+                    ADCrms  += pow(data[ipoint] - ADCmean, 2);
+                }
+                ADCrms = sqrt(ADCrms/nPoints);
+                printf("READING: mean = %f | rms = %f\n", ADCmean, ADCrms);
+                break;
+            }
+        }
+    }
+}
 
 int loopOverPP( struct mpsse_context *i2c, int nPoints,
                 struct channel_reading* data) {
@@ -75,7 +108,7 @@ int loopOverPP( struct mpsse_context *i2c, int nPoints,
             }
             data[8*imux + ich].rms = sqrt(ADCrms/nPoints);
 
-            printf("%s\t", MUX_LABLES[imux][ich] );
+            printf("%s\t", MUX_DISPLAY_LABLES[imux][ich] );
             printf("MUX %d \t CH %d \t ADC_RD %f ( %f )\n",
                    imux, ich, data[8*imux + ich].mean,
                    data[8*imux + ich].rms);
@@ -93,12 +126,14 @@ int main(int argc, char** argv) {
     int writeFlag = 0;
     int loopFlag = 0;
     int transmitFlag = 0;
+    int singleReadFlag = 0;
 
     char data = 0x00;
     int  ndata = 1; // numer of bites to read
     char addr = 0x00;
     int port = 1025; // port for external communication
-    int npoints = 8;
+    int npoints = 10;
+    char* label = "Not Used";
 
 
     /* options */
@@ -114,11 +149,12 @@ int main(int argc, char** argv) {
         {"loop"          , required_argument,  0, 'l'},
         {"transmit"      , required_argument,  0, 't'},
         {"data-points"   , required_argument,  0, 'N'},
+        {"single"        , required_argument,  0, 's'},
         {0,0,0,0}
     };
 
     int optIndex = 0;
-    while ( (opt = getopt_long (argc, argv, "hrwa:d:n:clt:N:", longOptions, &optIndex) ) != -1 ) {
+    while ( (opt = getopt_long (argc, argv, "hrwa:d:n:clt:N:s:", longOptions, &optIndex) ) != -1 ) {
 
         switch (opt)
         {
@@ -134,6 +170,7 @@ int main(int argc, char** argv) {
             printf( "l(--loop  ) : \t returns all the voltages on each mux.\n" );
             printf( "t(--transmit): <port> \t will continuosly transmit data to <port>.\n" );
             printf( "N(--data-points): <npoints> \t number of points to loop through for each reading.\n" );
+            printf( "s(--single) : \t read mux og given label.\n" );
             return 0;
             break;
         case 'r':
@@ -164,6 +201,10 @@ int main(int argc, char** argv) {
             break;
         case 'N':
             npoints = atoi(optarg);
+            break;
+        case 's':
+            singleReadFlag = 1;
+            label = optarg;
             break;
         default:
             return 0;
@@ -213,6 +254,10 @@ int main(int argc, char** argv) {
         if( readADCflag == 1 ) {
             float adcRes = readADC( i2c );
             printf("ADC reading: %f V\n", adcRes);
+        }
+
+        if (singleReadFlag == 1) {
+            singleReading(i2c, label, npoints);
         }
 
         /* loop */
