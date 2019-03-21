@@ -33,11 +33,12 @@ def getBoards():
 
 def main():
     # buildCCode(clean=True)
-    # createBoard(['1.0', '20190315'])
+    # createBoard(['1.0', '20190320'])
     boards = getBoards()
+    # print(boards)
     board = Board(boards.ID.values[0])
     board.measure()
-    board.listMeasurements()
+    board.getVoltageDelta()
     # print(listTables('data/db.sqlite'))
 
 

@@ -18,7 +18,6 @@ float readADC( struct mpsse_context *i2c ) {
 
 }
 
-
 int loopOverChannels(struct mpsse_context *i2c, int nPoints, char* dataBuf) {
     sprintf( dataBuf, "%d,", nPoints );
     struct channel_reading data[NUMBER_OF_CHANNELS];
