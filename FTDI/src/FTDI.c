@@ -20,12 +20,12 @@ struct channel_reading readChannel(struct mpsse_context *i2c, int nPoints, int i
         printf("ERROR: cannot configure mux.\n");
         return data;
     }
-    // Add sleep to llow voltage to settle to value
+    // Add sleep to allow voltage to settle to value
     usleep(50e3);
     int ipoint = 0;
     float ADCmean=0, ADCrms=0;
     while (ipoint < nPoints) {
-        float reading = readADC(i2c) * ADC_REF_V; // + ADC_OFFSET;
+        float reading = readADC(i2c) * ADC_REF_V;
         if (imux == 1 && ich == 4) {
             reading = reading * 10.0/7.0;
         } else if (imux == 3 && ich == 1) {
@@ -76,43 +76,14 @@ int loopOverChannels(struct mpsse_context *i2c, int nPoints, char* dataBuf) {
 
 
 int singleReading(struct mpsse_context *i2c, char* mux_label, int nPoints) {
-    float* data = (float*)malloc(nPoints*sizeof(float));
+    struct channel_reading data;
     int imux, ich;
     for(imux = 0; imux < 4; imux++) {
         for(ich = 0; ich < 8; ich++) {
             if (strcmp(mux_label, MUX_LABLES[imux][ich]) == 0) {
                 printf("Selecting MUX %d CHANNEL %d LABEL %s...\n", imux, ich, mux_label);
-                int confRes = config( i2c, GND_MUX[imux][ich], imux, ich );
-                if( confRes < 0 ) {
-                    return -1;
-                }
-                // Add sleep to allow voltage to settle to value
-                usleep(50e3);
-                int ipoint = 0;
-                float ADCmean=0, ADCrms=0;
-                while (ipoint < nPoints) {
-                    float reading = readADC(i2c) * ADC_REF_V; //+ADC_OFFSET;
-                    if (imux == 1 && ich == 4) {
-                        reading = reading * 10.0/7.0;
-                    } else if (imux == 3 && ich == 1) {
-                        reading = reading * 24/7.0;
-                    }
-                    reading += ADC_OFFSET;
-                    data[ipoint] = reading;
-                    ADCmean += reading;
-                    printf("r: %f\n", reading);
-                    if (ipoint % 5 == 5) {
-                      printf("\n");
-                    }
-                    ipoint++;
-                    usleep(20);
-                }
-                ADCmean = ADCmean/nPoints;
-                for(ipoint = 0; ipoint < nPoints; ipoint++) {
-                    ADCrms  += pow(data[ipoint] - ADCmean, 2);
-                }
-                ADCrms = sqrt(ADCrms/nPoints);
-                printf("READING: mean = %f | rms = %f\n", ADCmean, ADCrms);
+                data = readChannel(i2c, nPoints, imux, ich);
+                printf("READING: mean = %f | rms = %f\n", data.mean, data.rms);
                 break;
             }
         }
