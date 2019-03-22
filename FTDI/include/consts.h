@@ -24,6 +24,7 @@ extern const uint32_t I2C_MUX_CH7;
 extern const uint32_t ADC_ADDR;
 
 extern const float ADC_REF_V; // adc reference in volt
+extern const float ADC_OFFSET;
 
 /* analog MUXs */
 

@@ -54,7 +54,13 @@ int singleReading(struct mpsse_context *i2c, char* mux_label, int nPoints) {
                 int ipoint = 0;
                 float ADCmean=0, ADCrms=0;
                 while (ipoint < nPoints) {
-                    float reading = readADC(i2c);
+                    float reading = readADC(i2c); //+ADC_OFFSET;
+                    if (imux == 1 && ich == 4) {
+                        reading = reading * 10.0/7.0;
+                    } else if (imux == 3 && ich == 1) {
+                        reading = reading * 24/7.0;
+                    }
+                    reading += ADC_OFFSET;
                     data[ipoint] = reading;
                     ADCmean += reading;
                     printf("r: %f\n", reading);
@@ -79,10 +85,9 @@ int singleReading(struct mpsse_context *i2c, char* mux_label, int nPoints) {
 int loopOverPP( struct mpsse_context *i2c, int nPoints,
                 struct channel_reading* data) {
 
-    int imux=0;
-    for( ; imux<4; imux++ ) {
-        int ich=0;
-        for( ; ich<8; ich++ ) {
+    int imux, ich;
+    for(imux = 0; imux < 4; imux++) {
+        for(ich = 7; ich >= 0; ich--) {
             int confRes = config( i2c, GND_MUX[imux][ich], imux, ich );
             if( confRes < 0 ) {
                 return -1;
@@ -94,7 +99,13 @@ int loopOverPP( struct mpsse_context *i2c, int nPoints,
             int ipoint = 0;
             float ADCmean=0, ADCrms=0;
             while (ipoint < nPoints) {
-                float reading = readADC(i2c);
+                float reading = readADC(i2c); // + ADC_OFFSET;
+                if (imux == 1 && ich == 4) {
+                    reading = reading * 10.0/7.0;
+                } else if (imux == 3 && ich == 1) {
+                    reading = reading * 24/7.0;
+                }
+                reading += ADC_OFFSET;
                 data[8*imux + ich].readings[ipoint] = reading;
                 ADCmean += reading;
                 ipoint++;

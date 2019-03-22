@@ -3,17 +3,17 @@ import subprocess
 
 
 def listTables(dbname):
-    engine = sqlalchemy.create_engine('sqlite:///'+dbname, echo=True)
+    engine = sqlalchemy.create_engine('sqlite:///'+dbname, echo=False)
     return engine.table_names()
 
 
 def dropTable(dbname, table):
-    engine = sqlalchemy.create_engine('sqlite:///'+dbname, echo=True)
+    engine = sqlalchemy.create_engine('sqlite:///'+dbname, echo=False)
     engine.execute("DROP TABLE IF EXISTS '%s'" % table)
 
 
 def viewTable(dbname, table):
-    engine = sqlalchemy.create_engine('sqlite:///'+dbname, echo=True)
+    engine = sqlalchemy.create_engine('sqlite:///'+dbname, echo=False)
     return engine.execute("SELECT * FROM '%s'" % table).fetchall()
 
 

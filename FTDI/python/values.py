@@ -34,3 +34,5 @@ default_voltages = pd.DataFrame([{
     'X0_POWER_MGTAVCC_S': 0.8,
     'X0_POWER_MGTAVTT_S': 1.2
 }])
+
+PATH = '/home/dmonk/serenity-test-board/FTDI'

@@ -1,8 +1,10 @@
 import subprocess
 import pandas as pd
+import numpy as np
 import sqlalchemy
-from databasing import dropTable, listTables, viewTable
+# from databasing import dropTable, listTables, viewTable
 from board import Board
+# from colorama import init, Fore, Back, Style
 
 
 def buildCCode(clean=False):
@@ -12,7 +14,8 @@ def buildCCode(clean=False):
 
 
 def createBoard(metadata):
-    engine = sqlalchemy.create_engine('sqlite:///data/db.sqlite', echo=False)
+    engine = sqlalchemy.create_engine(
+        'sqlite:///data/db.sqlite', echo=False)
     if ('boards' in listTables('data/db.sqlite')):
         df = pd.read_sql("SELECT * FROM boards", con=engine)
         max_id = df.ID.astype(int).max()
@@ -26,19 +29,20 @@ def createBoard(metadata):
 
 
 def getBoards():
-    engine = sqlalchemy.create_engine('sqlite:///data/db.sqlite', echo=False)
+    engine = sqlalchemy.create_engine(
+        'sqlite:///data/db.sqlite', echo=False)
     df = pd.read_sql("SELECT * FROM boards", con=engine)
     return df
 
 
 def main():
-    # buildCCode(clean=True)
+    buildCCode(clean=True)
     # createBoard(['1.0', '20190320'])
     boards = getBoards()
     # print(boards)
     board = Board(boards.ID.values[0])
     board.measure()
-    board.getVoltageDelta()
+    print(sum(np.abs(board.getVoltageDelta()['delta'])))
     # print(listTables('data/db.sqlite'))
 
 
