@@ -6,128 +6,6 @@
 
 #include "main.h"
 
-
-float readADC( struct mpsse_context *i2c ) {
-
-    uint32_t *data = (uint32_t*) malloc(2);
-    I2Cread( i2c, ADC_ADDR, data, 2 );
-    uint32_t result = (data[0] & 0xff) << 8;
-    result = result | (data[1] & 0xff);
-
-    return (((float)result) * ADC_REF_V) / powf(2,16);
-
-}
-
-int loopOverChannels(struct mpsse_context *i2c, int nPoints, char* dataBuf) {
-    sprintf( dataBuf, "%d,", nPoints );
-    struct channel_reading data[NUMBER_OF_CHANNELS];
-    int i;
-    for (i = 0; i < NUMBER_OF_CHANNELS; i++) {
-      data[i].label = MUX_LABLES[i / 8][i % 8];
-      data[i].readings = (float*)malloc(nPoints*sizeof(float));
-    }
-    loopOverPP(i2c, nPoints, data);
-    for (i = 0; i < NUMBER_OF_CHANNELS; i++) {
-      data[i].label = MUX_LABLES[i / 8][i % 8];
-      sprintf(dataBuf, "%s%s,", dataBuf, data[i].label);
-      int j;
-      for(j = 0; j < nPoints ; j++) {
-          sprintf(dataBuf, "%s%f,", dataBuf,
-                  data[i].readings[j]);
-      }
-    }
-}
-
-int singleReading(struct mpsse_context *i2c, char* mux_label, int nPoints) {
-    float* data = (float*)malloc(nPoints*sizeof(float));
-    int imux, ich;
-    for(imux = 0; imux < 4; imux++) {
-        for(ich = 0; ich < 8; ich++) {
-            if (strcmp(mux_label, MUX_LABLES[imux][ich]) == 0) {
-                printf("Selecting MUX %d CHANNEL %d LABEL %s...\n", imux, ich, mux_label);
-                int confRes = config( i2c, GND_MUX[imux][ich], imux, ich );
-                if( confRes < 0 ) {
-                    return -1;
-                }
-                // Add sleep to llow voltage to settle to value
-                usleep(50e3);
-                int ipoint = 0;
-                float ADCmean=0, ADCrms=0;
-                while (ipoint < nPoints) {
-                    float reading = readADC(i2c); //+ADC_OFFSET;
-                    if (imux == 1 && ich == 4) {
-                        reading = reading * 10.0/7.0;
-                    } else if (imux == 3 && ich == 1) {
-                        reading = reading * 24/7.0;
-                    }
-                    reading += ADC_OFFSET;
-                    data[ipoint] = reading;
-                    ADCmean += reading;
-                    printf("r: %f\n", reading);
-                    if (ipoint % 5 == 5) {
-                      printf("\n");
-                    }
-                    ipoint++;
-                    usleep(20);
-                }
-                ADCmean = ADCmean/nPoints;
-                for(ipoint = 0; ipoint < nPoints; ipoint++) {
-                    ADCrms  += pow(data[ipoint] - ADCmean, 2);
-                }
-                ADCrms = sqrt(ADCrms/nPoints);
-                printf("READING: mean = %f | rms = %f\n", ADCmean, ADCrms);
-                break;
-            }
-        }
-    }
-}
-
-int loopOverPP( struct mpsse_context *i2c, int nPoints,
-                struct channel_reading* data) {
-
-    int imux, ich;
-    for(imux = 0; imux < 4; imux++) {
-        for(ich = 7; ich >= 0; ich--) {
-            int confRes = config( i2c, GND_MUX[imux][ich], imux, ich );
-            if( confRes < 0 ) {
-                return -1;
-            }
-
-            // Add sleep to llow voltage to settle to value
-            usleep(50e3);
-
-            int ipoint = 0;
-            float ADCmean=0, ADCrms=0;
-            while (ipoint < nPoints) {
-                float reading = readADC(i2c); // + ADC_OFFSET;
-                if (imux == 1 && ich == 4) {
-                    reading = reading * 10.0/7.0;
-                } else if (imux == 3 && ich == 1) {
-                    reading = reading * 24/7.0;
-                }
-                reading += ADC_OFFSET;
-                data[8*imux + ich].readings[ipoint] = reading;
-                ADCmean += reading;
-                ipoint++;
-                usleep(20);
-            }
-            data[8*imux + ich].mean = ADCmean/nPoints;
-
-            for( ipoint=0 ; ipoint<nPoints ; ipoint++ ) {
-                ADCrms  += pow(data[8*imux + ich].readings[ipoint] - data[8*imux + ich].mean, 2);
-            }
-            data[8*imux + ich].rms = sqrt(ADCrms/nPoints);
-
-            printf("%s\t", MUX_DISPLAY_LABLES[imux][ich] );
-            printf("MUX %d \t CH %d \t ADC_RD %f ( %f )\n",
-                   imux, ich, data[8*imux + ich].mean,
-                   data[8*imux + ich].rms);
-        }
-    }
-    return 0;
-}
-
-
 int main(int argc, char** argv) {
 
     /* */
@@ -282,7 +160,7 @@ int main(int argc, char** argv) {
             // printf("%s\n", buffer);
             writeToFile(buffer);
 
-            if( transmitFlag==1 ) {
+            /*if( transmitFlag==1 ) {
                 int sockfd, portno, n;
 
                 struct sockaddr_in serv_addr;
@@ -324,7 +202,7 @@ int main(int argc, char** argv) {
 
                 close( sockfd );
 
-            }
+            }*/
 
             return 0;
 
