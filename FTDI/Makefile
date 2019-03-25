@@ -30,3 +30,4 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(CXX_SRCEXT)
 clean:
 	@echo "Cleaning...";
 	@echo "$(RM) -r $(BUILDDIR) $(TARGET)"; $(RM) -r $(BUILDDIR) $(TARGET)
+	@echo "$(RM) include/*.gch"; $(RM) include/*.gch

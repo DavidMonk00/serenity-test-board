@@ -101,17 +101,14 @@ int main(int argc, char** argv) {
 
     /* I2C interface */
     struct mpsse_context *i2c = NULL;
-    //i2c = MPSSE( I2C, ONE_HUNDRED_KHZ, MSB );
-    i2c = OpenIndex(0x0403, 0x6010, I2C, ONE_HUNDRED_KHZ, MSB,
-    	            IFACE_A, NULL, NULL, 0);
-
-    if( i2c != NULL && i2c->open ) {
+    FT2232H* ftdi = new FT2232H();
+    if(ftdi->i2c_enable) {
 
         printf( "*** FTDI I2C CONNECTION OPEN ***\n" );
 
         /* write to device */
         if( writeFlag==1 ) {
-            int ret = I2Cwrite( i2c, addr, data );
+            int ret = ftdi->i2c->write(addr, data);
             if( ret >= 0 ) {
                 printf("Writing operation done.\n");
             }
@@ -123,7 +120,7 @@ int main(int argc, char** argv) {
         /* read to device */
         if( readFlag==1 ) {
             uint32_t *rData = (uint32_t*) malloc (ndata);
-            int ret = I2Cread( i2c, addr, rData, ndata );
+            int ret = ftdi->i2c->read(addr, rData, ndata);
             if( ret >= 0 ){
                 printf("Reading operation done, date read:\n");
                 int idata=0;
@@ -135,35 +132,31 @@ int main(int argc, char** argv) {
             else {
                 printf("Writing operation failed. Error:%d\n", ret);
             }
-
         }
 
         /* read ADC */
         if( readADCflag == 1 ) {
             int i;
             for (i = 0; i < npoints; i++) {
-                float adcRes = readADC( i2c );
+                float adcRes = ftdi->readADC();
                 printf("ADC reading: %f V\n", adcRes);
             }
-
         }
 
         if (singleReadFlag == 1) {
-            singleReading(i2c, label, npoints);
+            ftdi->singleReading(label, npoints);
         }
 
         /* loop */
         if( loopFlag == 1 ) {
             printf("All voltages on Serenity (in Volt):\n");
-            char buffer[1000000];
-            loopOverChannels(i2c, npoints, buffer);
+            ftdi->loopOverChannels(npoints);
             // printf("%s\n", buffer);
-            writeToFile(buffer);
+            ftdi->writeToFile();
             return 0;
-
         }
 
-        Close(i2c);
+        delete ftdi;
         printf( "*** FTDI I2C CONNECTION CLOSED ***\n" );
         return 0 ;
 
