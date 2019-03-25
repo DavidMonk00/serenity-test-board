@@ -35,7 +35,7 @@ int I2CIO::write(uint32_t addr, uint32_t data) {
     return 0;
 }
 
-int I2CIO::read(uint32_t addr, uint32_t *data, uint32_t ndata ) {
+int I2CIO::read(uint32_t addr, uint32_t *data, uint32_t ndata) {
     char* rData = NULL;
     int ret = Start( m_context );
     char rAddr = (addr|I2C_RD);
@@ -45,7 +45,7 @@ int I2CIO::read(uint32_t addr, uint32_t *data, uint32_t ndata ) {
         for(; idata<ndata; idata++) {
             if( idata == (ndata-1) ) // send Nack if is the lat read
                 SendNacks( m_context );
-            rData = Read( m_context, 1 );
+            rData = Read( m_context, 1);
             data[idata] = *rData;
                 SendAcks( m_context );
         }

@@ -16,5 +16,5 @@ public:
     virtual ~I2CIO();
     int getStatus();
     int write(uint32_t addr, uint32_t data);
-    int read(uint32_t addr, uint32_t *data, uint32_t ndata );
+    int read(uint32_t addr, uint32_t *data, uint32_t ndata=1);
 };
