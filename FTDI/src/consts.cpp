@@ -1,4 +1,4 @@
-#include "consts.h"
+#include "consts.hpp"
 
 const uint32_t I2C_WR = 0x00;
 const uint32_t I2C_RD = 0x01;

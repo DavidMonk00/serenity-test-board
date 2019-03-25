@@ -4,19 +4,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef __cplusplus
-extern "C"{
-#endif
+#include "consts.hpp"
 
-/* mpasse */
-#include <mpsse.h>
+#ifndef _LIBMPSSE_
+#define _LIBMPSSE_
 
-#ifdef __cplusplus
+extern "C" {
+    #include <mpsse.h>
 }
-#endif
 
-#include "consts.h"
-#include "I2CIO.h"
+#endif /* end of include guard: _LIBMPSSE_ */
+
+#include "I2CIO.hpp"
 
 int selectI2Cline( struct mpsse_context *i2c, uint32_t line );
 int select_MUX_GND_channel( struct mpsse_context *i2c, uint32_t ch );

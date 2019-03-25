@@ -6,20 +6,19 @@
 #include <math.h>
 #include <unistd.h>
 
-#include "consts.h"
-#include "I2CIO.h"
-#include "configuration.h"
+#include "consts.hpp"
+#include "configuration.hpp"
+#include "I2CIO.hpp"
 
-#ifdef __cplusplus
-extern "C"{
-#endif
+#ifndef _LIBMPSSE_
+#define _LIBMPSSE_
 
-/* mpasse */
-#include <mpsse.h>
-
-#ifdef __cplusplus
+extern "C" {
+    #include <mpsse.h>
 }
-#endif
+
+#endif /* end of include guard: _LIBMPSSE_ */
+
 
 float readADC( struct mpsse_context *i2c );
 struct channel_reading readChannel(struct mpsse_context *i2c, int nPoints, int imux, int ich);

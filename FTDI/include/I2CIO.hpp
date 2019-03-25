@@ -3,20 +3,11 @@
 /* C */
 #include <stdio.h>
 #include <stdlib.h>
+#include "consts.hpp"
 
-#ifdef __cplusplus
-extern "C"{
-#endif
-
-/* mpasse */
-#include <mpsse.h>
-
-#ifdef __cplusplus
+extern "C" {
+    #include <mpsse.h>
 }
-#endif
-
-
-#include "consts.h"
 
 
 int I2Cwrite( struct mpsse_context *i2c, uint32_t addr, uint32_t data);

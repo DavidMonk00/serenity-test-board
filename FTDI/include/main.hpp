@@ -1,5 +1,3 @@
-//#pragma once
-
 /* C */
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,13 +5,10 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifdef __cplusplus
-extern "C"{
-#endif
+#include "FT2232H.hpp"
+#include "export.hpp"
+#include "FTDI_util.hpp"
 
-#include "export.h"
-#include "FTDI.h"
-
-#ifdef __cplusplus
+extern "C" {
+    #include <mpsse.h>
 }
-#endif

@@ -1,4 +1,4 @@
-#include "configuration.h"
+#include "configuration.hpp"
 
 int selectI2Cline( struct mpsse_context *i2c, uint32_t line ) {
 

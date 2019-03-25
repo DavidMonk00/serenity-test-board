@@ -1,4 +1,4 @@
-#include "FTDI.h"
+#include "FTDI_util.hpp"
 
 float readADC( struct mpsse_context *i2c ) {
 

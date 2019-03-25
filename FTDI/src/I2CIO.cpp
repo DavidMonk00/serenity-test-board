@@ -1,4 +1,4 @@
-#include "I2CIO.h"
+#include "I2CIO.hpp"
 
 /* serenity I2C */
 int I2Cwrite( struct mpsse_context *i2c, uint32_t addr, uint32_t data) {
