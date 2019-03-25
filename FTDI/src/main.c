@@ -102,7 +102,7 @@ int main(int argc, char** argv) {
     /* I2C interface */
     struct mpsse_context *i2c = NULL;
     //i2c = MPSSE( I2C, ONE_HUNDRED_KHZ, MSB );
-    i2c = OpenIndex(0x0403, 0x6010, I2C, FOUR_HUNDRED_KHZ, MSB,
+    i2c = OpenIndex(0x0403, 0x6010, I2C, ONE_HUNDRED_KHZ, MSB,
     	            IFACE_A, NULL, NULL, 0);
 
     if( i2c != NULL && i2c->open ) {
@@ -159,57 +159,12 @@ int main(int argc, char** argv) {
             loopOverChannels(i2c, npoints, buffer);
             // printf("%s\n", buffer);
             writeToFile(buffer);
-
-            /*if( transmitFlag==1 ) {
-                int sockfd, portno, n;
-
-                struct sockaddr_in serv_addr;
-                struct hostent *server;
-
-                char hostname[] = "localhost";
-
-                portno = port;
-
-                sockfd = socket(AF_INET, SOCK_STREAM, 0);
-
-                if (sockfd < 0)
-                    return -1;
-                    // error("ERROR opening socket");
-                server = gethostbyname( hostname );
-
-                if (server == NULL) {
-                    fprintf(stderr,"ERROR, no such host\n");
-                    exit(0);
-                }
-
-                memset( &serv_addr, 0, sizeof( serv_addr ) );
-                serv_addr.sin_family = AF_INET;
-                bcopy((char *)server->h_addr,
-                      (char *)&serv_addr.sin_addr.s_addr,
-                      server->h_length);
-                serv_addr.sin_port = htons(portno);
-
-                if ( connect( sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr) ) < 0) {
-                  return -1;
-                  // error("ERROR connecting");
-
-                }
-
-                n = write( sockfd, buffer, strlen(buffer) );
-                if ( n < 0 )
-                    return -1;
-                    // error("ERROR writing to socket");
-
-                close( sockfd );
-
-            }*/
-
             return 0;
 
         }
 
         Close(i2c);
-        printf( "*** FTDI I2C CONNECTION CLOSE ***\n" );
+        printf( "*** FTDI I2C CONNECTION CLOSED ***\n" );
         return 0 ;
 
     }
