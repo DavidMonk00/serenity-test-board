@@ -10,8 +10,16 @@
 #include "I2CIO.h"
 #include "configuration.h"
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 /* mpasse */
 #include <mpsse.h>
+
+#ifdef __cplusplus
+}
+#endif
 
 float readADC( struct mpsse_context *i2c );
 struct channel_reading readChannel(struct mpsse_context *i2c, int nPoints, int imux, int ich);

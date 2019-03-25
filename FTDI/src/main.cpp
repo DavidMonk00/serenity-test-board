@@ -4,7 +4,7 @@
 
  */
 
-#include "main.h"
+#include "main.hpp"
 
 int main(int argc, char** argv) {
 
@@ -21,7 +21,7 @@ int main(int argc, char** argv) {
     char addr = 0x00;
     int port = 1025; // port for external communication
     int npoints = 10;
-    char* label = "Not Used";
+    char* label = (char*)"Not Used";
 
 
     /* options */
