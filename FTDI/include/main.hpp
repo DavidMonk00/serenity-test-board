@@ -6,9 +6,6 @@
 #include <unistd.h>
 
 #include "FT2232H.hpp"
-#include "export.hpp"
-#include "FTDI_util.hpp"
-#include "I2C_serial.hpp"
 
 extern "C" {
     #include <mpsse.h>

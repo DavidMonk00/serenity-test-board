@@ -7,10 +7,9 @@
 #include <unistd.h>
 #include <time.h>
 
-#include "I2C_serial.hpp"
+#include "I2CIO.hpp"
 #include "consts.hpp"
 #include "component.hpp"
-#include "I2CIO.hpp"
 #include "configuration.hpp"
 
 
@@ -27,7 +26,7 @@ private:
 
 public:
     int i2c_enable;
-    I2C_serial* i2c;
+    I2CIO* i2c;
 
     FT2232H (void);
     virtual ~FT2232H (void);

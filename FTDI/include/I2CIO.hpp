@@ -1,14 +1,20 @@
 #pragma once
 
-/* C */
-#include <stdio.h>
-#include <stdlib.h>
 #include "consts.hpp"
+#include <stdio.h>
 
 extern "C" {
     #include <mpsse.h>
 }
 
+class I2CIO {
+private:
+    struct mpsse_context *m_context;
 
-int I2Cwrite( struct mpsse_context *i2c, uint32_t addr, uint32_t data);
-int I2Cread( struct mpsse_context *i2c, uint32_t addr, uint32_t *data, uint32_t ndata );
+public:
+    I2CIO();
+    virtual ~I2CIO();
+    int getStatus();
+    int write(uint32_t addr, uint32_t data);
+    int read(uint32_t addr, uint32_t *data, uint32_t ndata );
+};

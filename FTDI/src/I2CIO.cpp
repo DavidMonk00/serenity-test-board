@@ -1,19 +1,19 @@
-#include "I2C_serial.hpp"
+#include "I2CIO.hpp"
 
-I2C_serial::I2C_serial(void) {
+I2CIO::I2CIO(void) {
     m_context = OpenIndex(0x0403, 0x6010, I2C, ONE_HUNDRED_KHZ, MSB,
     	            IFACE_A, NULL, NULL, 0);
 }
 
-I2C_serial::~I2C_serial(void) {
+I2CIO::~I2CIO(void) {
     Close(m_context);
 }
 
-int I2C_serial::getStatus() {
+int I2CIO::getStatus() {
     return m_context->open;
 }
 
-int I2C_serial::write(uint32_t addr, uint32_t data) {
+int I2CIO::write(uint32_t addr, uint32_t data) {
     Start(m_context);
     char wAddr = (addr|I2C_WR);
     Write(m_context, &wAddr, 1);
@@ -35,7 +35,7 @@ int I2C_serial::write(uint32_t addr, uint32_t data) {
     return 0;
 }
 
-int I2C_serial::read(uint32_t addr, uint32_t *data, uint32_t ndata ) {
+int I2CIO::read(uint32_t addr, uint32_t *data, uint32_t ndata ) {
     char* rData = NULL;
     int ret = Start( m_context );
     char rAddr = (addr|I2C_RD);

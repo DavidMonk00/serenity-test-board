@@ -1,7 +1,7 @@
 #include "FT2232H.hpp"
 
 FT2232H::FT2232H(void) {
-    i2c = new I2C_serial();
+    i2c = new I2CIO();
     if (i2c->getStatus()) {
         i2c_enable = 1;
     } else {
