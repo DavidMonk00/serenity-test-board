@@ -11,9 +11,16 @@ CXX_SOURCES := $(shell find $(SRCDIR) -type f -name *.$(CXX_SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(C_SOURCES:.$(C_SRCEXT)=.o))
 OBJECTS += $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CXX_SOURCES:.$(CXX_SRCEXT)=.o))
 CFLAGS := -g
-CXXFLAGS := -g
-LIB := -lmpsse -lm -lftdi
-INC := -Iinclude
+CXXFLAGS := -g -std=c++11
+FTDI_VERSION := $(shell find /usr/include/ -name "ftdi.h" | sed -e "s/\/usr\/include\///g")
+ifeq ($(FTDI_VERSION), ftdi.h)
+	LIBFTDI := ftdi
+	INC := -Iinclude
+else
+	LIBFTDI := ftdi1
+	INC := -Iinclude -I/usr/include/libftdi1
+endif
+LIB := -lmpsse -lm -l$(LIBFTDI)
 
 $(TARGET): $(OBJECTS)
 	@echo "Linking..."
@@ -25,7 +32,7 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(C_SRCEXT)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(CXX_SRCEXT)
 	@mkdir -p $(BUILDDIR)
-	@echo "$(CXX) $(CXXFLAGS) $(INC) -c -o $@ $<"; $(CXX) $(CFLAGS) $(INC) -c -o $@ $<
+	@echo "$(CXX) $(CXXFLAGS) $(INC) -c -o $@ $<"; $(CXX) $(CXXFLAGS) $(INC) -c -o $@ $<
 
 clean:
 	@echo "Cleaning...";
