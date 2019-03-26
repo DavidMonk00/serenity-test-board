@@ -14,10 +14,12 @@ FT2232H::~FT2232H(void) {
 }
 
 float FT2232H::readADC(void) {
-    uint32_t *data = (uint32_t*) malloc(2);
-    i2c->read(ADC_ADDR, data, 2 );
-    uint32_t result = (data[0] & 0xff) << 8;
-    result = result | (data[1] & 0xff);
+    // uint32_t *data = (uint32_t*) malloc(2);
+    std::vector<uint8_t> data;
+    data.resize(2);
+    i2c->send(ADC_ADDR|I2C_RD, {}, data);
+    uint32_t result = ((uint32_t)data[0] & 0xff) << 8;
+    result = result | ((uint32_t)data[1] & 0xff);
     return ((float)result) / powf(2,16);
 }
 

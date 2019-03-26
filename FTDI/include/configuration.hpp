@@ -3,10 +3,10 @@
 /* C */
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
 
 #include "consts.hpp"
 #include "I2CIO.hpp"
-
 
 int selectI2Cline(I2CIO* i2c, uint32_t line );
 int select_MUX_GND_channel(I2CIO* i2c, uint32_t ch );

@@ -4,6 +4,7 @@
 #include <getopt.h>
 #include <string.h>
 #include <unistd.h>
+#include <vector>
 
 #include "FT2232H.hpp"
 

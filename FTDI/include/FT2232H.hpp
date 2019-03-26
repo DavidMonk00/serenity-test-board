@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <iostream>
+#include <vector>
 
 #include "I2CIO.hpp"
 #include "consts.hpp"

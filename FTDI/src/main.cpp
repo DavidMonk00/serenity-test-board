@@ -108,7 +108,8 @@ int main(int argc, char** argv) {
 
         /* write to device */
         if( writeFlag==1 ) {
-            int ret = ftdi->i2c->write(addr, data);
+            std::vector<uint8_t> NULL_READ_VECTOR;
+            int ret = ftdi->i2c->send(addr|I2C_WR, {(uint8_t)data}, NULL_READ_VECTOR);
             if( ret >= 0 ) {
                 printf("Writing operation done.\n");
             }
@@ -119,18 +120,12 @@ int main(int argc, char** argv) {
 
         /* read to device */
         if( readFlag==1 ) {
-            uint32_t *rData = (uint32_t*) malloc (ndata);
-            int ret = ftdi->i2c->read(addr, rData, ndata);
-            if( ret >= 0 ){
-                printf("Reading operation done, date read:\n");
-                int idata=0;
-                for(; idata<ndata; idata++) {
-                    printf("0x%dx\n", rData[idata]);
-                }
-                free(rData);
-            }
-            else {
-                printf("Writing operation failed. Error:%d\n", ret);
+            std::vector<uint8_t> rData;
+            rData.resize(ndata);
+            ftdi->i2c->send(addr|I2C_RD, {}, rData);
+            printf("Reading operation done, date read:\n");
+            for(auto i : rData) {
+                printf("0x%x\n", i);
             }
         }
 
