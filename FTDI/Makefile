@@ -12,7 +12,7 @@ OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(C_SOURCES:.$(C_SRCEXT)=.o))
 OBJECTS += $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CXX_SOURCES:.$(CXX_SRCEXT)=.o))
 CFLAGS := -g
 CXXFLAGS := -g
-LIB := -lmpsse -lm
+LIB := -lmpsse -lm -lftdi
 INC := -Iinclude
 
 $(TARGET): $(OBJECTS)

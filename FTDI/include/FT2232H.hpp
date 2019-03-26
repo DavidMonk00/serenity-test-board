@@ -13,11 +13,6 @@
 #include "configuration.hpp"
 
 
-extern "C" {
-    #include <mpsse.h>
-}
-
-
 class FT2232H : Component {
 private:
     char buffer[100000];
