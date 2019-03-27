@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
     }
 
     /* I2C interface */
-    struct mpsse_context *i2c = NULL;
+    // struct mpsse_context *i2c = NULL;
     FT2232H* ftdi = new FT2232H();
     if(ftdi->i2c_enable) {
 
@@ -109,13 +109,7 @@ int main(int argc, char** argv) {
         /* write to device */
         if( writeFlag==1 ) {
             std::vector<uint8_t> NULL_READ_VECTOR;
-            int ret = ftdi->i2c->send(addr|I2C_WR, {(uint8_t)data}, NULL_READ_VECTOR);
-            if( ret >= 0 ) {
-                printf("Writing operation done.\n");
-            }
-            else {
-                printf("Writing operation failed. Error:%d\n", ret);
-            }
+            ftdi->i2c->send(addr|I2C_WR, {(uint8_t)data}, NULL_READ_VECTOR);
         }
 
         /* read to device */
@@ -150,16 +144,10 @@ int main(int argc, char** argv) {
             ftdi->writeToFile();
             return 0;
         }
-
+        
         delete ftdi;
         printf( "*** FTDI I2C CONNECTION CLOSED ***\n" );
         return 0 ;
-
     }
-
-    printf("ERROR >>> Failed to initialize MPSSE: %s\n", ErrorString(i2c));
-    printf("fail\n");
-
     return 0;
-
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdlib.h>
-#include <netinet/in.h>
+#include <stdint.h>
 
 #define NUMBER_OF_CHANNELS 32
 

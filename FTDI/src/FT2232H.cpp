@@ -1,12 +1,8 @@
 #include "FT2232H.hpp"
 
 FT2232H::FT2232H(void) {
-    i2c = new I2CIO();
-    if (i2c->getStatus()) {
-        i2c_enable = 1;
-    } else {
-        i2c_enable = 0;
-    }
+    i2c = new FTDI(0x0403, 0x6010, ONE_HUNDRED_KHZ, IFACE_A);
+    i2c_enable = 1;
 }
 
 FT2232H::~FT2232H(void) {
@@ -31,6 +27,7 @@ struct channel_reading FT2232H::readChannel(int nPoints, int imux, int ich) {
         printf("ERROR: cannot configure mux.\n");
         return data;
     }
+    printf("Finished configuration.\n");
     // Add sleep to allow voltage to settle to value
     usleep(50e3);
     int ipoint = 0;

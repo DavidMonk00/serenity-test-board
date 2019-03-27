@@ -9,7 +9,8 @@
 #include <iostream>
 #include <vector>
 
-#include "I2CIO.hpp"
+// #include "I2CIO.hpp"
+#include "FTDI.hpp"
 #include "consts.hpp"
 #include "component.hpp"
 #include "configuration.hpp"
@@ -23,7 +24,7 @@ private:
 
 public:
     int i2c_enable;
-    I2CIO* i2c;
+    FTDI* i2c;
 
     FT2232H (void);
     virtual ~FT2232H (void);

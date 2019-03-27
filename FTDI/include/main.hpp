@@ -8,6 +8,6 @@
 
 #include "FT2232H.hpp"
 
-extern "C" {
-    #include <mpsse.h>
-}
+// extern "C" {
+//     #include <mpsse.h>
+// }
