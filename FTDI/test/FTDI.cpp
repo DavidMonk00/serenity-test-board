@@ -7,7 +7,8 @@ FTDI::FTDI (int vid, int pid, int freq, int interface) {
         memset(i2c, 0, sizeof(struct mpsse_context));
         if(ftdi_init(&i2c->ftdi) == 0) {
             ftdi_set_interface(&i2c->ftdi, (ftdi_interface)interface);
-            if(ftdi_usb_open_desc_index(&i2c->ftdi, vid, pid, NULL, NULL, 0) == 0) {
+            int usb_set = ftdi_usb_open_desc_index(&i2c->ftdi, vid, pid, NULL, NULL, 0);
+            if(usb_set == 0) {
                 i2c->mode = mode;
 				i2c->vid = vid;
 				i2c->pid = pid;
@@ -19,6 +20,7 @@ FTDI::FTDI (int vid, int pid, int freq, int interface) {
 				status |= ftdi_write_data_set_chunksize(&i2c->ftdi, CHUNK_SIZE);
 				status |= ftdi_read_data_set_chunksize(&i2c->ftdi, CHUNK_SIZE);
                 status |= ftdi_set_bitmode(&i2c->ftdi, 0, BITMODE_RESET);
+                printf("Initialisation status: %d\n", status);
                 if(status == 0) {
                     i2c->ftdi.usb_read_timeout = USB_TIMEOUT;
                     i2c->ftdi.usb_write_timeout = USB_TIMEOUT;
@@ -28,11 +30,19 @@ FTDI::FTDI (int vid, int pid, int freq, int interface) {
                     i2c->open = 1;
                     usleep(SETUP_DELAY);
                     ftdi_usb_purge_buffers(&i2c->ftdi);
+                } else {
+                    throw std::runtime_error("Error initialising FTDI.");
                 }
+            } else {
+                printf("Error code: %d\n", usb_set);
+                throw std::runtime_error("Error: ftdi unable to open USB.");
             }
+        } else {
+            throw std::runtime_error("Error: ftdi_init failed.");
         }
     }
 }
+
 FTDI::~FTDI () {
     if(i2c) {
         if(i2c->open) {
@@ -44,6 +54,7 @@ FTDI::~FTDI () {
         i2c = NULL;
     }
 }
+
 void FTDI::read(uint8_t addr, std::vector<uint8_t>& read_data) {
     if (read_data.size() == 0) {
         return;
@@ -59,6 +70,7 @@ void FTDI::read(uint8_t addr, std::vector<uint8_t>& read_data) {
         } else {
             setAck(NACK);
         }
+        usleep(1e5);
         read_data[i] = (uint8_t)(*(readByte()));
     }
     stop();
@@ -98,6 +110,7 @@ void FTDI::setAck(int ack) {
         throw std::runtime_error("Error setting ack: context not valid.");
     }
 }
+
 int FTDI::getAck() {
 	int ack = 0;
 	if (i2c != NULL && i2c->open) {
@@ -105,6 +118,7 @@ int FTDI::getAck() {
 	}
 	return ack;
 }
+
 void FTDI::start() {
 	if (i2c != NULL && i2c->open) {
 		if(i2c->status == STARTED) {
@@ -118,9 +132,11 @@ void FTDI::start() {
 		i2c->status = STARTED;
 	} else {
 		i2c->status = STOPPED;
+        printf("I2C->open : %d\n", i2c->open);
         throw std::runtime_error("Error starting I2C: context not valid.");
 	}
 }
+
 void FTDI::rawWrite(unsigned char *buf, int size) {
     if(i2c->mode) {
         if(ftdi_write_data(&i2c->ftdi, buf, size) == size) {
@@ -129,6 +145,7 @@ void FTDI::rawWrite(unsigned char *buf, int size) {
         }
     }
 }
+
 void FTDI::setBitsLow(int port) {
 	char buf[CMD_SIZE] = { 0 };
 	buf[0] = SET_BITS_LOW;
@@ -136,6 +153,7 @@ void FTDI::setBitsLow(int port) {
 	buf[2] = i2c->tris;
 	return rawWrite((unsigned char *) &buf, sizeof(buf));
 }
+
 void FTDI::stop() {
 	if (i2c != NULL && i2c->open) {
 		/* In I2C mode, we need to ensure that the data line goes low while the clock line is low to avoid sending an inadvertent start condition */
@@ -150,6 +168,7 @@ void FTDI::stop() {
         throw std::runtime_error("Error stopping I2C: context not valid.");
 	}
 }
+
 void FTDI::setClock(uint32_t freq) {
 	uint32_t system_clock = 0;
 	uint16_t divisor = 0;
@@ -178,15 +197,18 @@ void FTDI::setClock(uint32_t freq) {
 		rawWrite(buf, 3);
 		i2c->clock = divToFreq(system_clock, divisor);
 	} else {
-        throw std::runtime_error("Error stopping setting clock: context not valid.");
+        throw std::runtime_error("Error setting clock: context not valid.");
     }
 }
+
 uint16_t FTDI::freqToDiv(uint32_t system_clock, uint32_t freq) {
 	return (((system_clock / freq) / 2) - 1);
 }
+
 uint32_t FTDI::divToFreq(uint32_t system_clock, uint16_t div) {
 	return (system_clock / ((1 + div) * 2));
 }
+
 void FTDI::setMode(int endianess) {
 	int i = 0, setup_commands_size = 0;
 	unsigned char buf[CMD_SIZE] = { 0 };
@@ -237,9 +259,10 @@ void FTDI::setMode(int endianess) {
         buf[i++] = i2c->trish;
         rawWrite(buf, i);
 	} else {
-        throw std::runtime_error("Error stopping setting mode: context not valid.");
+        throw std::runtime_error("Error setting mode: context not valid.");
 	}
 }
+
 void FTDI::writeBytes(char *data, int size) {
 	unsigned char *buf = NULL;
 	int buf_size = 0, txsize = 0, n = 0;
@@ -261,6 +284,7 @@ void FTDI::writeBytes(char *data, int size) {
 		}
 	}
 }
+
 unsigned char *FTDI::buildBlockBuffer(uint8_t cmd, unsigned char *data, int size, int *buf_size) {
 	unsigned char *buf = NULL;
    	int i = 0, j = 0, k = 0, dsize = 0, num_blocks = 0, total_size = 0, xfer_size = 0;
@@ -337,6 +361,7 @@ unsigned char *FTDI::buildBlockBuffer(uint8_t cmd, unsigned char *data, int size
 	}
 	return buf;
 }
+
 void FTDI::rawRead(unsigned char *buf, int size) {
 	int n = 0, r = 0;
 	if (i2c->mode) {
@@ -357,6 +382,7 @@ void FTDI::rawRead(unsigned char *buf, int size) {
         throw std::runtime_error("Error reading data: mode not set.");
     }
 }
+
 char *FTDI::readByte(void) {
 	unsigned char *data = NULL, *buf = NULL;
 	unsigned char sbuf[SPI_RW_SIZE] = { 0 };
@@ -381,6 +407,7 @@ char *FTDI::readByte(void) {
 	}
 	return (char *) buf;
 }
+
 void FTDI::setLoopback(int enable) {
 	unsigned char buf[1] = { 0 };
 	if (i2c != NULL && i2c->open) {
@@ -391,20 +418,4 @@ void FTDI::setLoopback(int enable) {
 		}
 	    rawWrite(buf, 1);
 	}
-}
-
-
-int main(int argc, char const *argv[]) {
-    const int size = 2;
-    std::vector<uint8_t> dat;
-    dat.resize(size);
-    FTDI* ftdi = new FTDI(0x0403, 0x6010, ONE_HUNDRED_KHZ, IFACE_A);
-    for (int i = 0; i < 1000; i++) {
-        ftdi->read(0x61, dat);
-        for (int i = 0; i < 1; i++){
-            printf("0x%x%x\n", dat[0], dat[1]);
-        }
-    }
-    delete ftdi;
-    return 0;
 }
