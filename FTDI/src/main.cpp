@@ -15,6 +15,10 @@ int main(int argc, char** argv) {
     int loopFlag = 0;
     int transmitFlag = 0;
     int singleReadFlag = 0;
+    int muxConfigFlag = 0;
+    int mux_index = 0;
+    int channel_index = 0;
+    int mux_label_flag = 0;
 
     char data = 0x00;
     int  ndata = 1; // numer of bites to read
@@ -38,11 +42,14 @@ int main(int argc, char** argv) {
         {"transmit"      , required_argument,  0, 't'},
         {"data-points"   , required_argument,  0, 'N'},
         {"single"        , required_argument,  0, 's'},
+        {"mux"           , required_argument,  0, 'm'},
+        {"channel"       , required_argument,  0, 'x'},
+        {"label"         , required_argument,  0, 'L'},
         {0,0,0,0}
     };
 
     int optIndex = 0;
-    while ( (opt = getopt_long (argc, argv, "hrwa:d:n:clt:N:s:", longOptions, &optIndex) ) != -1 ) {
+    while ( (opt = getopt_long (argc, argv, "hrwa:d:n:clt:N:s:m:x:L:", longOptions, &optIndex) ) != -1 ) {
 
         switch (opt)
         {
@@ -58,7 +65,10 @@ int main(int argc, char** argv) {
             printf( "l(--loop  ) : \t returns all the voltages on each mux.\n" );
             printf( "t(--transmit): <port> \t will continuosly transmit data to <port>.\n" );
             printf( "N(--data-points): <npoints> \t number of points to loop through for each reading.\n" );
-            printf( "s(--single) : \t read mux og given label.\n" );
+            printf( "s(--single) <label>: \t read mux of given label.\n" );
+            printf( "m(--mux  ) <index>: \t Index of mux to select.\n" );
+            printf( "x(--channel  ) <index>: \t Index of channel to select.\n" );
+            printf( "L(--label) <label> \t configure muxes to select given label.\n");
             return 0;
             break;
         case 'r':
@@ -92,6 +102,18 @@ int main(int argc, char** argv) {
             break;
         case 's':
             singleReadFlag = 1;
+            label = optarg;
+            break;
+        case 'm':
+            muxConfigFlag = 1;
+            mux_index = atoi(optarg);
+            break;
+        case 'x':
+            muxConfigFlag = 1;
+            channel_index = atoi(optarg);
+            break;
+        case 'L':
+            mux_label_flag = 1;
             label = optarg;
             break;
         default:
@@ -144,7 +166,17 @@ int main(int argc, char** argv) {
             ftdi->writeToFile();
             return 0;
         }
-        
+
+        if (muxConfigFlag) {
+            ftdi->selectMuxChannel(mux_index, channel_index);
+            return 0;
+        }
+
+        if (mux_label_flag) {
+            ftdi->selectMuxChannel(label);
+            return 0;
+        }
+
         delete ftdi;
         printf( "*** FTDI I2C CONNECTION CLOSED ***\n" );
         return 0 ;

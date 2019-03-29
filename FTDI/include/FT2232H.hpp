@@ -33,4 +33,6 @@ public:
     int loopOverChannels(int nPoints);
     int singleReading(char* mux_label, int nPoints);
     int writeToFile(void);
+    void selectMuxChannel(int imux, int ich);
+    void selectMuxChannel(char *mux_label);
 };

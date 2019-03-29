@@ -20,6 +20,7 @@
 #define SPI_RW_SIZE		(63 * 1024)
 #define SPI_TRANSFER_SIZE	512
 #define I2C_TRANSFER_SIZE	64
+#define I2C 5
 
 #define LATENCY_MS		2
 #define TIMEOUT_DIVISOR		1000000
@@ -60,11 +61,6 @@ enum clock_rates {
 	FIFTEEN_MHZ      = 15000000,
 	THIRTY_MHZ 	 = 30000000,
 	SIXTY_MHZ 	 = 60000000
-};
-
-/* Supported MPSSE modes */
-enum modes {
-	I2C     = 5,
 };
 
 enum pins {
@@ -108,44 +104,24 @@ enum low_bits_status {
 	STOPPED
 };
 
-struct vid_pid {
-	int vid;
-	int pid;
-	char *description;
-};
-
-struct mpsse_context {
-	char *description;
-	struct ftdi_context ftdi;
-	enum modes mode;
-	enum low_bits_status status;
-	int flush_after_read;
-	int vid;
-	int pid;
-	int clock;
-	int xsize;
-	int open;
-	int endianess;
-	uint8_t tris;
-	uint8_t pstart;
-	uint8_t pstop;
-	uint8_t pidle;
-	uint8_t gpioh;
-	uint8_t trish;
-	uint8_t bitbang;
-	uint8_t tx;
-	uint8_t rx;
-	uint8_t txrx;
-	uint8_t tack;
-	uint8_t rack;
-};
-
 
 class FTDI {
 private:
-    struct mpsse_context *i2c;
-    static const enum modes mode = I2C;
+	struct ftdi_context mFtdi;
+	enum low_bits_status mStatus;
+    static const int mode = I2C;
     static const int endianess = MSB;
+	int mXsize;
+	int mOpen;
+	uint8_t mPstart;
+	uint8_t mPstop;
+	uint8_t mPidle;
+	uint8_t mTx;
+	uint8_t mRx;
+	uint8_t mTxRx;
+	uint8_t mTack;
+	uint8_t mRack;
+
     void setAck(int ack);
     int getAck();
     void start();
@@ -155,12 +131,11 @@ private:
     void setClock(uint32_t freq);
     uint16_t freqToDiv(uint32_t system_clock, uint32_t freq);
     uint32_t divToFreq(uint32_t system_clock, uint16_t div);
-    void setMode(int endianess);
+    void setMode();
     void writeBytes(char *data, int size);
     unsigned char *buildBlockBuffer(uint8_t cmd, unsigned char *data, int size, int *buf_size);
     void rawRead(unsigned char *buf, int size);
     char *readByte(void);
-    void setLoopback(int enable);
 
 public:
     FTDI (int vid, int pid, int freq, int interface);

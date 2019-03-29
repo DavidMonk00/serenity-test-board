@@ -103,13 +103,31 @@ int FT2232H::writeToFile() {
   time( &rawtime );
   info = localtime( &rawtime );
   strftime(buff,160,"/home/dmonk/serenity-test-board/FTDI/data/%Y%m%d%H%M%S.dat", info);
-
   FILE *file = fopen(buff, "w");
-
   int results = fputs(buffer, file);
   if (results == EOF) {
     return results;
   }
   fclose(file);
   return 0;
+}
+
+void FT2232H::selectMuxChannel(int imux, int ich) {
+    printf("Selecting MUX %d CHANNEL %d LABEL %s...\n", imux, ich, MUX_LABLES[imux][ich]);
+    int confRes = config(i2c, GND_MUX[imux][ich], imux, ich );
+    if( confRes < 0 ) {
+        printf("ERROR: cannot configure mux.\n");
+    }
+}
+
+void FT2232H::selectMuxChannel(char *mux_label) {
+int imux, ich;
+    for(imux = 0; imux < 4; imux++) {
+        for(ich = 0; ich < 8; ich++) {
+            if (strcmp(mux_label, MUX_LABLES[imux][ich]) == 0) {
+                selectMuxChannel(imux, ich);
+                break;
+            }
+        }
+    }
 }
