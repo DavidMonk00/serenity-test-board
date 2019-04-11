@@ -8,6 +8,28 @@ table, th, td {
 </style>
 {% endblock style %}
 
+{% block script %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="text/javascript">
+var statusIntervalId = window.setInterval(checkStatus, 1000);
+function checkStatus() {
+    $.ajax({
+        method: "GET",
+        url: "/viewdata/check_status",
+        data: {},
+        success: function(data) {
+            console.log(data)
+            if (data.ftdi_connected == true) {
+                $("#status").css({ color: "green" }).text("online");
+            } else {
+                $("#status").css({ color: "red" }).text("offline");
+            }
+        }
+    });
+};
+</script>
+{% endblock script %}
+
 {% block title %}
 <title>Serenity Test Board</title>
 {% endblock title %}
@@ -20,5 +42,14 @@ table, th, td {
     <h1>Serenity Test Card</h1>
     <h2>Tested Cards</h2>
     {% include "index_table.html" %}
+    <h2>Status</h2>
+    <div class="ftdi-status">
+        <div style="float:left; padding-right:10px">
+            FTDI status:
+        </div>
+        <div id="status">
+            waiting for status...
+        </div>
+    </div>
 </body>
 {% endblock body %}

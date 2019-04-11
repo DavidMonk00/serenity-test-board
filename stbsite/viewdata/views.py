@@ -1,10 +1,11 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import JsonResponse
 from .main import getBoards
 from .board import Board
 from .databasing import viewTable
 from .values import PATH
 from datetime import datetime
+from .diagnostics import Diagnostics
 
 # Create your views here.
 
@@ -58,3 +59,11 @@ def data(request, board_id, timestring):
         "%d_test_%s" % (board_id, timestring)
     )
     return render(request, 'data.html', context)
+
+
+def checkStatus(request):
+    D = Diagnostics()
+    context = {
+        'ftdi_connected': D.checkFTDIOnline()
+    }
+    return JsonResponse(context)

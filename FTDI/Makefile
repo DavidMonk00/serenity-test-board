@@ -20,7 +20,7 @@ else
 	LIBFTDI := ftdi1
 	INC := -Iinclude -I/usr/include/libftdi1
 endif
-LIB := -lmpsse -lm -l$(LIBFTDI)
+LIB := -lm -l$(LIBFTDI)
 
 $(TARGET): $(OBJECTS)
 	@echo "Linking..."
