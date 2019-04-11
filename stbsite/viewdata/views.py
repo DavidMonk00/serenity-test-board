@@ -61,11 +61,22 @@ def data(request, board_id, timestring):
     return render(request, 'data.html', context)
 
 
-def checkStatus(request):
+def checkFTDIStatus(request):
     D = Diagnostics()
     context = {
         'ftdi_connected': D.checkFTDIOnline(),
+    }
+    return JsonResponse(context)
+
+
+def checkI2CStatus(request):
+    D = Diagnostics()
+    context = {
         'i2c_fanout_connected': D.testI2CFanout(),
         'adc_connected': D.testADC(),
     }
     return JsonResponse(context)
+
+
+def measure(request):
+    pass
