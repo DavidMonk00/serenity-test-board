@@ -36,7 +36,7 @@ class Board:
 
     def listMeasurements(self):
         engine = sqlalchemy.create_engine(
-            'sqlite:///data/db.sqlite', echo=False)
+            'sqlite:///'+PATH+'/data/db.sqlite', echo=False)
         self.df = pd.read_sql("SELECT * FROM board_%s" % self.ID, con=engine)
         return self.df
 

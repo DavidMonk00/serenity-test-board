@@ -9,16 +9,17 @@ table, th, td {
 {% endblock style %}
 
 {% block title %}
-<title>Serenity Test Board</title>
+<title>Board {{board_id}}</title>
 {% endblock title %}
 
 {% block body %}
 <body>
     {% block nav-bar %}
     >> <a href="/viewdata/">Home</a>
+    >> <a href="/viewdata/boards/{{board_id}}">Board {{board_id}}</a>
     {% endblock nav-bar %}
     <h1>Serenity Test Card</h1>
-    <h2>Tested Cards</h2>
-    {% include "index_table.html" %}
+    <h2>Board ID: {{board_id}}</h2>
+    {% include "board_table.html" %}
 </body>
 {% endblock body %}

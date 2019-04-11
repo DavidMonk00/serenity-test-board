@@ -3,6 +3,7 @@ import pandas as pd
 import sqlalchemy
 from .databasing import dropTable, listTables, viewTable
 from .board import Board
+from .values import PATH
 
 
 def buildCCode(clean=False):
@@ -28,7 +29,7 @@ def createBoard(metadata):
 
 def getBoards():
     engine = sqlalchemy.create_engine(
-        'sqlite:///data/db.sqlite', echo=False)
+        'sqlite:///'+PATH+'/data/db.sqlite', echo=False)
     df = pd.read_sql("SELECT * FROM boards", con=engine)
     return df
 

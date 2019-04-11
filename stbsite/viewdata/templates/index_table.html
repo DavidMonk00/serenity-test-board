@@ -1,0 +1,9 @@
+{% extends "base_table.html" %}
+
+{% block nav-column %}
+{% if forloop.counter0|divisibleby:table_width %}
+<td><a href="/viewdata/boards/{{column}}">{{column}}</a></td>
+{% else %}
+<td>{{column}}</td>
+{% endif %}
+{% endblock nav-column %}

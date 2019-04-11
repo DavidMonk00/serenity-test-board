@@ -1,0 +1,18 @@
+<table>
+    <thead>
+        <tr>
+            {% for column in header %}
+                <th>{{column}}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+  {% for row in results %}
+  <tr>
+      {% for column in row %}
+          {% block nav-column %}
+          <td>{{column}}</td>
+          {% endblock nav-column %}
+      {% endfor %}
+  </tr>
+  {% endfor %}
+</table>
