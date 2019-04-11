@@ -1,9 +1,9 @@
 import subprocess
 from glob import glob
-from data import Data
+from .data import Data
 import pandas as pd
 import sqlalchemy
-from values import default_voltages, PATH
+from .values import default_voltages, PATH
 from matplotlib import pyplot as plt
 from sklearn import preprocessing
 from scipy import stats

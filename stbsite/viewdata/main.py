@@ -1,8 +1,8 @@
 import subprocess
 import pandas as pd
 import sqlalchemy
-from databasing import dropTable, listTables, viewTable
-from board import Board
+from .databasing import dropTable, listTables, viewTable
+from .board import Board
 
 
 def buildCCode(clean=False):

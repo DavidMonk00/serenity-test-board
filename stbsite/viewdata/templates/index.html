@@ -1,15 +1,21 @@
-<!DOCTYPE html>
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-    {% block head %}
-    <head>
-        <meta charset="utf-8">
-        <title>Serenity Test Board</title>
-    </head>
-    {% endblock head %}
-    {% block body %}
-    <body>
+{% extends "base.html" %}
 
-    </body>
-    {% endblock body %}
-</html>
+{% block style %}
+<style>
+table, th, td {
+  border: 1px solid black;
+}
+</style>
+{% endblock style %}
+
+{% block title %}
+<title>Serenity Test Board</title>
+{% endblock title %}
+
+{% block body %}
+<body>
+    <h1>Serenity Test Card</h1>
+    <h2>Tested Cards</h2>
+    {% include "table.html" %}
+</body>
+{% endblock body %}

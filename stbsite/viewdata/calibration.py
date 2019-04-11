@@ -2,7 +2,7 @@ import subprocess
 from glob import glob
 import numpy as np
 from data import Data
-from board import Board
+from .board import Board
 import datetime
 
 
