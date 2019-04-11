@@ -27,7 +27,6 @@ struct channel_reading FT2232H::readChannel(int nPoints, int imux, int ich) {
         printf("ERROR: cannot configure mux.\n");
         return data;
     }
-    printf("Finished configuration.\n");
     // Add sleep to allow voltage to settle to value
     usleep(50e3);
     int ipoint = 0;
