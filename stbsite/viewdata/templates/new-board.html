@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+
+{% block script %}
+{{ block.super }}
+<script type="text/javascript">
+    function submitNewBoard() {
+        if($('#version').val() == "") {
+            $('#version-warning').css({color: "red"}).text('Please enter a version number.')
+            return false;
+        } else {
+            $('#version-warning').css({color: "black"}).text('')
+            return true;
+        }
+    };
+</script>
+{% endblock script %}
+
+{% block style %}
+<style>
+
+</style>
+{% endblock style %}
+
+{% block title %}
+<title>New Board</title>
+{% endblock title %}
+
+{% block body %}
+<body>
+    {% block nav-bar %}
+    >> <a href="/viewdata/">Home</a>
+    >> <a href="/viewdata/measure">Measure</a>
+    >> <a href="/viewdata/new-board">New Board</a>
+    {% endblock nav-bar %}
+    <h1>Serenity Test Card</h1>
+    <h2>New Board</h2>
+    <form class="" onsubmit="return submitNewBoard()" action="/viewdata/submit-new-board" method="get">
+        <table>
+            <tr>
+                <td>Serenity version:</td>
+                <td><input name="version" id="version" type="text"></td>
+                <td id="version-warning"></td>
+            </tr>
+            <tr>
+                <td>Date First tested:</td>
+                <td><input name="timestring" id="timstring" type="text" value="{{timestring}}"></td>
+            </tr>
+        </table>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+{% endblock body %}

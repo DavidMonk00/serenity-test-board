@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from .main import getBoards
+from .main import getBoards, createBoard
 from .board import Board
 from .databasing import viewTable
 from .values import PATH
 from datetime import datetime
 from .diagnostics import Diagnostics
+from django.shortcuts import redirect
 
 # Create your views here.
 
@@ -79,4 +80,39 @@ def checkI2CStatus(request):
 
 
 def measure(request):
-    pass
+    context = displayDataTable(getBoards)
+    context['boards'] = getBoards().values
+    return render(request, 'measure.html', context)
+
+
+def newBoard(request):
+    context = {
+        'timestring': datetime.strftime(datetime.now(), '%Y%m%d')
+    }
+    return render(request, 'new-board.html', context)
+
+
+def submitNewBoard(request):
+    metadata = [request.GET.get('version'), request.GET.get('timestring')]
+    createBoard(metadata)
+    return redirect('/viewdata/measure')
+
+
+def getMostRecentMeasurement(request):
+    boards = getBoards()
+    board = Board(boards.ID.values[int(request.GET.get('board_id'))])
+    context = displayDataTable(board.listMeasurements)
+    print(context)
+    date_fmt = datetime.strptime(timestring, '%Y%m%d%H%M%S')
+    print(date_fmt)
+    context['date_fmt'] = custom_strftime(
+        '%A {S} %B %Y at %-I:%M:%S %p',
+        date_fmt)
+    context['board_id'] = board_id
+    context['timestring'] = timestring
+    context['header'] = ['Measurement Number'] + context['header'][1:]
+    context['results'] = viewTable(
+        PATH+'/data/db.sqlite',
+        "%d_test_%s" % (board_id, timestring)
+    )
+    return render(request, 'data.html', context)

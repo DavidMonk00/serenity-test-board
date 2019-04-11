@@ -14,8 +14,8 @@ def buildCCode(clean=False):
 
 def createBoard(metadata):
     engine = sqlalchemy.create_engine(
-        'sqlite:///data/db.sqlite', echo=False)
-    if ('boards' in listTables('data/db.sqlite')):
+        'sqlite:///'+PATH+'/data/db.sqlite', echo=False)
+    if ('boards' in listTables(PATH+'/data/db.sqlite')):
         df = pd.read_sql("SELECT * FROM boards", con=engine)
         max_id = df.ID.astype(int).max()
         id = max_id + 1

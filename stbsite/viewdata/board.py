@@ -37,8 +37,12 @@ class Board:
     def listMeasurements(self):
         engine = sqlalchemy.create_engine(
             'sqlite:///'+PATH+'/data/db.sqlite', echo=False)
-        self.df = pd.read_sql("SELECT * FROM board_%s" % self.ID, con=engine)
-        return self.df
+        try:
+            self.df = pd.read_sql(
+                "SELECT * FROM board_%s" % self.ID, con=engine)
+            return self.df
+        except sqlalchemy.exc.OperationalError:
+            return pd.DataFrame()
 
     def getVoltageDelta(self):
         if not hasattr(self, 'df'):
