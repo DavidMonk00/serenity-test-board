@@ -125,9 +125,6 @@ int main(int argc, char** argv) {
     // struct mpsse_context *i2c = NULL;
     FT2232H* ftdi = new FT2232H();
     if(ftdi->i2c_enable) {
-
-        printf( "*** FTDI I2C CONNECTION OPEN ***\n" );
-
         /* write to device */
         if( writeFlag==1 ) {
             std::vector<uint8_t> NULL_READ_VECTOR;
@@ -139,7 +136,7 @@ int main(int argc, char** argv) {
             std::vector<uint8_t> rData;
             rData.resize(ndata);
             ftdi->i2c->send(addr|I2C_RD, {}, rData);
-            printf("Reading operation done, date read:\n");
+            printf("Reading operation done, data read:\n");
             for(auto i : rData) {
                 printf("0x%x\n", i);
             }
@@ -178,7 +175,6 @@ int main(int argc, char** argv) {
         }
 
         delete ftdi;
-        printf( "*** FTDI I2C CONNECTION CLOSED ***\n" );
         return 0 ;
     }
     return 0;

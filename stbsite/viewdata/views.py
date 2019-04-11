@@ -64,6 +64,8 @@ def data(request, board_id, timestring):
 def checkStatus(request):
     D = Diagnostics()
     context = {
-        'ftdi_connected': D.checkFTDIOnline()
+        'ftdi_connected': D.checkFTDIOnline(),
+        'i2c_fanout_connected': D.testI2CFanout(),
+        'adc_connected': D.testADC(),
     }
     return JsonResponse(context)

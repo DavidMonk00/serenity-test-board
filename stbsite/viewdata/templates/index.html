@@ -20,9 +20,19 @@ function checkStatus() {
         success: function(data) {
             console.log(data)
             if (data.ftdi_connected == true) {
-                $("#status").css({ color: "green" }).text("online");
+                $("#ftdi-status").css({ color: "green" }).text("online");
             } else {
-                $("#status").css({ color: "red" }).text("offline");
+                $("#ftdi-status").css({ color: "red" }).text("offline");
+            }
+            if (data.i2c_fanout_connected == true) {
+                $("#i2c-fanout-status").css({ color: "green" }).text("online");
+            } else {
+                $("#i2c-fanout-status").css({ color: "red" }).text("offline");
+            }
+            if (data.adc_connected == 'ERROR') {
+                $("#adc-status").css({ color: "red" }).text(data.adc_connected);
+            } else {
+                $("#adc-status").css({ color: "black" }).text(data.adc_connected);
             }
         }
     });
@@ -47,8 +57,24 @@ function checkStatus() {
         <div style="float:left; padding-right:10px">
             FTDI status:
         </div>
-        <div id="status">
+        <div id="ftdi-status">
             waiting for status...
+        </div>
+    </div>
+    <div class="i2c-fanout-status">
+        <div style="float:left; padding-right:10px">
+            I2C Fanout status:
+        </div>
+        <div id="i2c-fanout-status">
+            waiting for status...
+        </div>
+    </div>
+    <div class="adc-status">
+        <div style="float:left; padding-right:10px">
+            ADC test reading:
+        </div>
+        <div id="adc-status">
+            no reading.
         </div>
     </div>
 </body>
