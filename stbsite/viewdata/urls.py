@@ -13,4 +13,5 @@ urlpatterns = [
     path('check_ftdi_status', views.checkFTDIStatus, name='ftdi-status'),
     path('check_i2c_status', views.checkI2CStatus, name='i2c-status'),
     path('submit-new-board', views.submitNewBoard, name='submit-new-board'),
+    path('get-measurement', views.getMostRecentMeasurement, name='get-measurement'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

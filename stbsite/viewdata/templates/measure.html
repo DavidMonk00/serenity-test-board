@@ -40,28 +40,30 @@ div.run-test {
     {% endblock nav-bar %}
     <h1>Serenity Test Card</h1>
     {% include "index_table.html" %}
-    <div class="select-board">
-        <div>
-            Select board:
-        </div>
-        <div class="board-form">
-            <form class="board" action="/viewdata/get-measurement" method="get">
+    <form class="board" action="/viewdata/get-measurement" method="get">
+        <div class="select-board">
+            <div>
+                Select board:
+            </div>
+            <div class="board-form">
                 <select name="boards">
                     {% for board in boards %}
                         <option value="{{board.0}}">{{board.0}}</option>
                     {% endfor %}
                 </select>
-            </form>
+            </div>
+            <div class="new-board">
+                <button type="button" onclick="location.href='/viewdata/new-board';">New Board</button>
+            </div>
         </div>
-        <div class="new-board">
-            <button type="button" onclick="location.href='/viewdata/new-board';">New Board</button>
+        <div class="run-test">
+            <button type="submit">Run Measurement</button>
         </div>
-    </div>
-    <div class="run-test">
-        <button type="button" name="run-test">Run Measurement</button>
-    </div>
+    </form>
     <div class="data">
-        Data goes here.
+        <table id="data">
+
+        </table>
     </div>
 </body>
 {% endblock body %}

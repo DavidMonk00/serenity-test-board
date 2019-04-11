@@ -25,14 +25,14 @@ class Board:
         subprocess.call(
             [PATH + '/measure_all.sh', '10']
         )
-        files = glob('data/*.dat')
+        files = glob(PATH+'/data/*.dat')
         data = Data(self.ID, files[-1])
         data.getDataFrame()
-        data.uploadDataToDB('data/db.sqlite')
+        data.uploadDataToDB(PATH+'/data/db.sqlite')
         cols = ['timestamp'] + list(data.df.columns)
         row = [data.timestring] + list(data.df.mean().values)
         self.data_row = pd.DataFrame([row], columns=cols)
-        self.__uploadToBoardTable(self.data_row, 'data/db.sqlite')
+        self.__uploadToBoardTable(self.data_row, PATH+'/data/db.sqlite')
 
     def listMeasurements(self):
         engine = sqlalchemy.create_engine(

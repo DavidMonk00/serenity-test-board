@@ -16,7 +16,7 @@ def displayDataTable(df_func):
     context = {
         'header': list(df.columns),
         'table_width': len(list(df.columns)),
-        'results': list(df.values),
+        'results': df.values.tolist(),
     }
     return context
 
@@ -100,19 +100,13 @@ def submitNewBoard(request):
 
 def getMostRecentMeasurement(request):
     boards = getBoards()
-    board = Board(boards.ID.values[int(request.GET.get('board_id'))])
+    board = Board(boards.ID.values[int(request.GET.get('boards'))])
+    board.measure()
     context = displayDataTable(board.listMeasurements)
-    print(context)
-    date_fmt = datetime.strptime(timestring, '%Y%m%d%H%M%S')
-    print(date_fmt)
-    context['date_fmt'] = custom_strftime(
-        '%A {S} %B %Y at %-I:%M:%S %p',
-        date_fmt)
-    context['board_id'] = board_id
-    context['timestring'] = timestring
+    recent = board.listMeasurements().timestamp
     context['header'] = ['Measurement Number'] + context['header'][1:]
-    context['results'] = viewTable(
+    context['results'] = [list(i) for i in viewTable(
         PATH+'/data/db.sqlite',
-        "%d_test_%s" % (board_id, timestring)
-    )
-    return render(request, 'data.html', context)
+        "%s_test_%s" % (request.GET.get('boards'), recent.max())
+    )]
+    return JsonResponse(context)
