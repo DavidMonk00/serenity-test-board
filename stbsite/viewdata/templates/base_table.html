@@ -1,4 +1,5 @@
 <table>
+    {% block table-body %}
     <thead>
         <tr>
             {% for column in header %}
@@ -6,13 +7,14 @@
             {% endfor %}
         </tr>
     </thead>
-  {% for row in results %}
-  <tr>
-      {% for column in row %}
-          {% block nav-column %}
-          <td>{{column}}</td>
-          {% endblock nav-column %}
-      {% endfor %}
-  </tr>
-  {% endfor %}
+    {% for row in results %}
+    <tr>
+        {% for column in row %}
+            {% block nav-column %}
+            <td>{{column}}</td>
+            {% endblock nav-column %}
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    {% endblock table-body %}
 </table>

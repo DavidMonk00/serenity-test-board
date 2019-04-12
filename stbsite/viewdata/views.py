@@ -1,33 +1,17 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
+
+from datetime import datetime
+import numpy as np
+
 from .main import getBoards, createBoard
-from .board import Board
 from .databasing import viewTable
 from .values import PATH
-from datetime import datetime
 from .diagnostics import Diagnostics
-from django.shortcuts import redirect
+from .analysistools import custom_strftime, displayDataTable, getBoard
+from .analysistools import getFooterStats
 
 # Create your views here.
-
-
-def displayDataTable(df_func):
-    df = df_func()
-    context = {
-        'header': list(df.columns),
-        'table_width': len(list(df.columns)),
-        'results': df.values.tolist(),
-    }
-    return context
-
-
-def suffix(d):
-    return 'th' if 11 <= d <= 13 else {1: 'st', 2: 'nd', 3: 'rd'}.get(
-        d % 10, 'th')
-
-
-def custom_strftime(format, t):
-    return t.strftime(format).replace('{S}', str(t.day) + suffix(t.day))
 
 
 def index(request):
@@ -36,29 +20,27 @@ def index(request):
 
 
 def board(request, board_id):
-    boards = getBoards()
-    board = Board(boards.ID.values[board_id])
-    context = displayDataTable(board.listMeasurements)
+    context = displayDataTable(getBoard(board_id).listMeasurements)
     context['board_id'] = board_id
     return render(request, 'board.html', context)
 
 
 def data(request, board_id, timestring):
-    boards = getBoards()
-    board = Board(boards.ID.values[board_id])
-    context = displayDataTable(board.listMeasurements)
+    context = displayDataTable(getBoard(board_id).listMeasurements)
     date_fmt = datetime.strptime(timestring, '%Y%m%d%H%M%S')
-    print(date_fmt)
     context['date_fmt'] = custom_strftime(
         '%A {S} %B %Y at %-I:%M:%S %p',
         date_fmt)
     context['board_id'] = board_id
     context['timestring'] = timestring
     context['header'] = ['Measurement Number'] + context['header'][1:]
-    context['results'] = viewTable(
+
+    data = viewTable(
         PATH+'/data/db.sqlite',
         "%d_test_%s" % (board_id, timestring)
     )
+    context['results'] = data
+    context['footer'] = getFooterStats(data)
     return render(request, 'data.html', context)
 
 
@@ -99,14 +81,16 @@ def submitNewBoard(request):
 
 
 def getMostRecentMeasurement(request):
-    boards = getBoards()
-    board = Board(boards.ID.values[int(request.GET.get('boards'))])
+    board = getBoard(int(request.GET.get('boards')))
     board.measure()
     context = displayDataTable(board.listMeasurements)
     recent = board.listMeasurements().timestamp
     context['header'] = ['Measurement Number'] + context['header'][1:]
-    context['results'] = [list(i) for i in viewTable(
+
+    data = [list(i) for i in viewTable(
         PATH+'/data/db.sqlite',
         "%s_test_%s" % (request.GET.get('boards'), recent.max())
     )]
+    context['results'] = data
+    context['footer'] = getFooterStats(data)
     return JsonResponse(context)

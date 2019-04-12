@@ -1,0 +1,16 @@
+{% extends "base_table.html" %}
+
+{% block table-body %}
+{{ block.super }}
+<tfoot>
+    <tr>
+        {% for column in footer %}
+            {% if forloop.counter0|divisibleby:table_width %}
+            <td>Mean</td>
+            {% else %}
+            <td>{{column}}</td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+</tfoot>
+{% endblock table-body %}

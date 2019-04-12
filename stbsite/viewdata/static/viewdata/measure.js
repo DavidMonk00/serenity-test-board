@@ -15,6 +15,15 @@ $(document).ready(function(){
                 }
                 html += '</tr>';
             }
+            html += '<tfoot><tr>';
+            for (var i = 0; i < response.footer.length; i++) {
+                if (i == 0) {
+                    html += '<td>' + 'Mean' + '</td>';
+                } else {
+                    html += '<td>' + response.footer[i] + '</td>';
+                }
+            }
+            html += '</tr></tfoot>';
             $('#data').html(html);
       },'json');
       return false;
