@@ -1,11 +1,8 @@
 {% extends "base.html" %}
+{% load static from staticfiles %}
 
 {% block style %}
-<style>
-table, th, td {
-  border: 1px solid black;
-}
-</style>
+<link rel="stylesheet" href="{% static "viewdata/css/base_table.css" %}">
 {% endblock style %}
 
 {% block title %}

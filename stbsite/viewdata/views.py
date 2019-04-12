@@ -81,16 +81,19 @@ def submitNewBoard(request):
 
 
 def getMostRecentMeasurement(request):
-    board = getBoard(int(request.GET.get('boards')))
-    board.measure()
-    context = displayDataTable(board.listMeasurements)
-    recent = board.listMeasurements().timestamp
-    context['header'] = ['Measurement Number'] + context['header'][1:]
+    if (request.GET.get('type') == "services"):
+        board = getBoard(int(request.GET.get('boards')))
+        board.measure(request.GET.get('measurement-slider'))
+        context = displayDataTable(board.listMeasurements)
+        recent = board.listMeasurements().timestamp
+        context['header'] = ['Measurement Number'] + context['header'][1:]
 
-    data = [list(i) for i in viewTable(
-        PATH+'/data/db.sqlite',
-        "%s_test_%s" % (request.GET.get('boards'), recent.max())
-    )]
-    context['results'] = data
-    context['footer'] = getFooterStats(data)
+        data = [list(i) for i in viewTable(
+            PATH+'/data/db.sqlite',
+            "%s_test_%s" % (request.GET.get('boards'), recent.max())
+        )]
+        context['results'] = data
+        context['footer'] = getFooterStats(data)
+    else:
+        context = {}
     return JsonResponse(context)

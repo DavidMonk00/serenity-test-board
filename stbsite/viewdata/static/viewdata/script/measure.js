@@ -29,3 +29,9 @@ $(document).ready(function(){
       return false;
    });
 });
+
+// function submitForm(action) {
+//     document.getElementById('board-select').action = action;
+//     console.log(action)
+//     document.getElementById('board-select').submit();
+// };

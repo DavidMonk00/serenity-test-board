@@ -35,4 +35,49 @@ default_voltages = pd.DataFrame([{
     'X0_POWER_MGTAVTT_S': 1.2
 }])
 
+CHANNEL_LISTS = {
+    'services': [
+        'SERVICES+1.5V',
+        'SERVICES+1.0V',
+        'SERVICES+1.8V',
+        'SERVICES+3.3V',
+        '5V_SCALED',
+        'ARTIX_MGTAVTT',
+        'ARTIX_MGTAVCC',
+        'SERVICES_POWER_STANDBY_+3.3V',
+        '+12_SCALED',
+    ],
+    'x0': [
+        'X0_POWER_MGTVCCAUC_N',
+        'X0_POWER_+1.8V_ANALOGUE',
+        'X0_POWER_MGTVCCAUC_S',
+        'X0_POWER_VCCINT',
+        'X0_POWER_+3.3V',
+        'X0_POWER_+1.8V',
+        'X0_POWER_VCCAUX',
+        'X0_POWER_MGTAVTT_N',
+        'X0_POWER_MGTAVCC_N',
+        'X0_POWER_MGTAVCC_S',
+        'X0_POWER_MGTAVTT_S'
+    ],
+    'x1': [
+        'X1_POWER_MGTVCCAUX_N',
+        'X1_POWER_MGTAVTT_S',
+        'X1_POWER_MGTAVCC_S',
+        'X1_POWER_MGTAVCC_N',
+        'X1_POWER_MGTAVTT_N',
+        'X1_POWER_VCCAUX',
+        'X1_POWER_+1.8V',
+        'X1_POWER_+3.3V',
+        'X1_POWER_MGTVCCAUX_N',
+        'X1_POWER_MGTAVTT_S',
+        'X1_POWER_MGTAVCC_S',
+        'X1_POWER_MGTAVCC_N',
+        'X1_POWER_MGTAVTT_N',
+        'X1_POWER_VCCAUX',
+        'X1_POWER_+1.8V',
+        'X1_POWER_+3.3V',
+    ]
+}
+
 PATH = '/home/dmonk/serenity-test-board/FTDI'

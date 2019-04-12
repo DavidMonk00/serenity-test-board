@@ -21,9 +21,9 @@ class Board:
                              con=engine, if_exists='append',
                              index=False)
 
-    def measure(self):
+    def measure(self, N='10'):
         subprocess.call(
-            [PATH + '/measure_all.sh', '10']
+            [PATH + '/bin/main', '-l', '-N', N]
         )
         files = glob(PATH+'/data/*.dat')
         data = Data(self.ID, files[-1])
@@ -49,8 +49,6 @@ class Board:
             self.listMeasurements()
         data_columns = list(self.df.columns[1:])
         data_columns.pop(data_columns.index('Not Used'))
-        data_columns.pop(data_columns.index('5V_SCALED'))
-        data_columns.pop(data_columns.index('+12_SCALED'))
         print(data_columns)
         delta = (self.df.loc[len(self.df)-1] - default_voltages.loc[0])
         r_delta = delta / default_voltages.loc[0]

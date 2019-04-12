@@ -2,16 +2,12 @@
 {% load static from staticfiles %}
 
 {% block style %}
-<style>
-table, th, td {
-  border: 1px solid black;
-}
-</style>
+<link rel="stylesheet" href="{% static "viewdata/css/base_table.css" %}">
 {% endblock style %}
 
 {% block script %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-<script src="{% static "viewdata/index.js" %}" charset="utf-8"></script>
+<script src="{% static "viewdata/script/index.js" %}" charset="utf-8"></script>
 {% endblock script %}
 
 {% block title %}
