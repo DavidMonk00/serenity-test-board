@@ -7,7 +7,7 @@ from .main import getBoards
 
 def getBoard(board_id):
     boards = getBoards()
-    board = Board(boards.ID.values[board_id])
+    board = Board(boards.loc[boards.ID == str(board_id)].ID.values[0])
     return board
 
 

@@ -80,6 +80,15 @@ def submitNewBoard(request):
     return redirect('/viewdata/measure')
 
 
+def deleteBoard(request):
+    print(request.GET.get('board_id'))
+    board = getBoard(int(request.GET.get('board_id')))
+    board.deleteBoard()
+    # metadata = [request.GET.get('version'), request.GET.get('timestring')]
+    # createBoard(metadata)
+    return JsonResponse({})
+
+
 def getMostRecentMeasurement(request):
     if (request.GET.get('type') == "services"):
         board = getBoard(int(request.GET.get('boards')))

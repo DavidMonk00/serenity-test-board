@@ -3,10 +3,9 @@ from glob import glob
 from .data import Data
 import pandas as pd
 import sqlalchemy
-from .values import default_voltages, PATH
+from .values import default_voltages, PATH, DB_PATH
+from .databasing import dropTable, listTables
 from matplotlib import pyplot as plt
-from sklearn import preprocessing
-from scipy import stats
 import numpy as np
 
 
@@ -14,9 +13,19 @@ class Board:
     def __init__(self, ID):
         self.ID = ID
 
-    def __uploadToBoardTable(self, df, dbname):
+    def deleteBoard(self):
+        engine = sqlalchemy.create_engine(DB_PATH, echo=False)
+        engine.execute(
+            "UPDATE '%s' SET Deleted=1 WHERE ID = %s" % ('boards', self.ID)
+        )
+        dropTable(PATH+'/data/db.sqlite', 'board_%s' % self.ID)
+        for i in listTables(PATH+'/data/db.sqlite'):
+            if ('%s_' % self.ID) in i:
+                dropTable(PATH+'/data/db.sqlite', i)
+
+    def __uploadToBoardTable(self, df):
         engine = sqlalchemy.create_engine(
-            'sqlite:///'+dbname, echo=False)
+            DB_PATH, echo=False)
         self.data_row.to_sql('board_' + self.ID,
                              con=engine, if_exists='append',
                              index=False)
@@ -28,15 +37,14 @@ class Board:
         files = glob(PATH+'/data/*.dat')
         data = Data(self.ID, files[-1])
         data.getDataFrame()
-        data.uploadDataToDB(PATH+'/data/db.sqlite')
+        data.uploadDataToDB()
         cols = ['timestamp'] + list(data.df.columns)
         row = [data.timestring] + list(data.df.mean().values)
         self.data_row = pd.DataFrame([row], columns=cols)
-        self.__uploadToBoardTable(self.data_row, PATH+'/data/db.sqlite')
+        self.__uploadToBoardTable(self.data_row)
 
     def listMeasurements(self):
-        engine = sqlalchemy.create_engine(
-            'sqlite:///'+PATH+'/data/db.sqlite', echo=False)
+        engine = sqlalchemy.create_engine(DB_PATH, echo=False)
         try:
             self.df = pd.read_sql(
                 "SELECT * FROM board_%s" % self.ID, con=engine)

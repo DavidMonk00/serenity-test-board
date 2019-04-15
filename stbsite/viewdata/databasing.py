@@ -18,6 +18,7 @@ def viewTable(dbname, table):
 
 
 if __name__ == '__main__':
-        for i in listTables('data/db.sqlite'):
-            dropTable('data/db.sqlite', i)
-        subprocess.call(['rm', '-rf', 'data/*.dat'])
+    from values import PATH
+    for i in listTables(PATH+'/data/db.sqlite'):
+        dropTable(PATH+'/data/db.sqlite', i)
+    subprocess.call(['rm', '-rf', 'data/*.dat'])

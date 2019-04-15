@@ -3,6 +3,7 @@ import numpy as np
 import sqlalchemy
 import re
 import datetime
+from .values import DB_PATH
 
 
 class Data:
@@ -36,11 +37,10 @@ class Data:
             columns=[i.strip() for i in self.data[0]]).astype(float)
         return self.df
 
-    def uploadDataToDB(self, dbname):
+    def uploadDataToDB(self):
         if not hasattr(self, 'df'):
             self.getDataFrame()
-        engine = sqlalchemy.create_engine(
-            'sqlite:///'+dbname, echo=False)
+        engine = sqlalchemy.create_engine(DB_PATH, echo=False)
         try:
             self.df.to_sql(self.board_ID + '_test_' + self.timestring,
                            con=engine, if_exists='replace',

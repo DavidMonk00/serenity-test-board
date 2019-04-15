@@ -5,6 +5,27 @@
 <link rel="stylesheet" href="{% static "viewdata/css/base_table.css" %}">
 {% endblock style %}
 
+{% block script %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="text/javascript">
+    function deleteBoard() {
+        if (confirm('Are you sure you want to delete this board?')) {
+            $.ajax({
+                method: "GET",
+                url: "/viewdata/delete-board?board_id={{board_id}}",
+                data: {},
+                success: function(data) {
+                    window.location = '/viewdata/';
+                }
+            });
+            return 1;
+        } else {
+            return 0;
+        };
+    };
+</script>
+{% endblock script %}
+
 {% block title %}
 <title>Board {{board_id}}</title>
 {% endblock title %}
@@ -17,6 +38,9 @@
     {% endblock nav-bar %}
     <h1>Serenity Test Card</h1>
     <h2>Board ID: {{board_id}}</h2>
+    <div style="padding-bottom: 20px">
+        <button type="button" name="button" onclick="deleteBoard()">Delete Board</button>
+    </div>
     {% include "board_table.html" %}
 </body>
 {% endblock body %}

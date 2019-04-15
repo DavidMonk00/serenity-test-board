@@ -81,3 +81,4 @@ CHANNEL_LISTS = {
 }
 
 PATH = '/home/dmonk/serenity-test-board/FTDI'
+DB_PATH = 'sqlite:///'+PATH+'/data/db.sqlite'

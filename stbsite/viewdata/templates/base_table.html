@@ -2,9 +2,11 @@
     {% block table-body %}
     <thead>
         <tr>
+            {% block header %}
             {% for column in header %}
                 <th>{{column}}</th>
             {% endfor %}
+            {% endblock %}
         </tr>
     </thead>
     {% for row in results %}

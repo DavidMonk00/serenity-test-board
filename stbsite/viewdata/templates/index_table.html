@@ -1,9 +1,21 @@
 {% extends "base_table.html" %}
 
+{% block header %}
+{% for column in header %}
+    {% if forloop.counter|divisibleby:table_width %}
+    {% else %}
+    <th>{{column}}</th>
+    {% endif %}
+{% endfor %}
+{% endblock %}
+
 {% block nav-column %}
 {% if forloop.counter0|divisibleby:table_width %}
 <td><a href="/viewdata/boards/{{column}}">{{column}}</a></td>
 {% else %}
+{% if forloop.counter|divisibleby:table_width %}
+{% else %}
 <td>{{column}}</td>
+{% endif %}
 {% endif %}
 {% endblock nav-column %}
