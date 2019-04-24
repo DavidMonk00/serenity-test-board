@@ -21,4 +21,4 @@ if __name__ == '__main__':
     from values import PATH
     for i in listTables(PATH+'/data/db.sqlite'):
         dropTable(PATH+'/data/db.sqlite', i)
-    subprocess.call(['rm', '-rf', 'data/*.dat'])
+    subprocess.call(['rm', '-rf', 'data/readings/*.json'])

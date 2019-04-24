@@ -37,7 +37,6 @@ def getFooterStats(data):
     mean = np.mean(np_data, axis=0)
     std = np.std(np_data, axis=0)
     footer = []
-    print(len(np_data.T))
     score = [0]
     for i in range(len(default_voltages_list)):
         if (

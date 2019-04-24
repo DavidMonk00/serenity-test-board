@@ -140,9 +140,9 @@ int main(int argc, char** argv) {
 
     if (singleReadFlag == 1) stb->singleReading(label, npoints);
 
-    if(loopFlag ==1 ) {
+    if(loopFlag == 1) {
         stb->loopOverChannels(npoints);
-        stb->writeToFile();
+        stb->writeToFile("all");
     }
 
     if (muxConfigFlag) stb->selectMuxChannel(mux_index, channel_index);

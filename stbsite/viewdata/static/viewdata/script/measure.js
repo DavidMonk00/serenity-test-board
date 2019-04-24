@@ -1,7 +1,7 @@
 $(document).ready(function(){
     var $form = $('form');
     $form.submit(function(){
-        $('#data').html('')
+        $('#data').html('Measuring voltages...')
         $.get($(this).attr('action'), $(this).serialize(), function(response){
             console.log(response);
             var html = '<thead><tr>';

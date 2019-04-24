@@ -80,16 +80,19 @@ void SerenityTestBoard::singleReading(char* mux_label, int nPoints) {
     }
 }
 
-void SerenityTestBoard::writeToFile() {
+void SerenityTestBoard::writeToFile(std::string reading_type) {
+    std::string path = "/home/dmonk/serenity-test-board/FTDI/data/readings/";
     time_t rawtime;
     struct tm *info;
-    char buff[160];
+    char buff[64];
     time( &rawtime );
     info = localtime( &rawtime );
-    strftime(buff,160,"/home/dmonk/serenity-test-board/FTDI/data/readings/%Y%m%d%H%M%S.json", info);
+    strftime(buff,64,"%Y%m%d%H%M%S", info);
+    std::ostringstream os;
+    os << path << reading_type << "_" << buff << ".json";
     std::ofstream file;
-    std::cout << buff << '\n';
-    file.open(buff);
+    std::cout << os.str() << '\n';
+    file.open(os.str());
     file << "{";
     for (auto i : readings) {
         file << "\"" << i.first << "\": [";
@@ -102,13 +105,6 @@ void SerenityTestBoard::writeToFile() {
     }
     file << "}";
     file.close();
-    //
-    // FILE *file = fopen(buff, "w");
-    // int results = fputs(buffer, file);
-    // if (results == EOF) {
-    // throw std::runtime_error("Error: Writing to file failed.");
-    // }
-    // fclose(file);
 }
 
 void SerenityTestBoard::selectMuxChannel(int imux, int ich) {
