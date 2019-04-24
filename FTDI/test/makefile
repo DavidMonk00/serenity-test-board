@@ -1,6 +1,6 @@
 CC := gcc
 CXX := g++
-SRCDIR := src
+SRCDIR := ../src
 BUILDDIR := build
 TARGET := bin/main
 
@@ -10,24 +10,19 @@ C_SOURCES := $(shell find $(SRCDIR) -type f -name *.$(C_SRCEXT))
 CXX_SOURCES := $(shell find $(SRCDIR) -type f -name *.$(CXX_SRCEXT))
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(C_SOURCES:.$(C_SRCEXT)=.o))
 OBJECTS += $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CXX_SOURCES:.$(CXX_SRCEXT)=.o))
-CFLAGS :=
-CXXFLAGS := -std=c++11
+CFLAGS := -g
+CXXFLAGS := -g -std=c++11
 FTDI_VERSION := $(shell find /usr/include/ -name "ftdi.h" | sed -e "s/\/usr\/include\///g")
 ifeq ($(FTDI_VERSION), ftdi.h)
 	LIBFTDI := ftdi
-	INC := -Iinclude
+	INC := -I../include
 else
 	LIBFTDI := ftdi1
-	INC := -Iinclude -I/usr/include/libftdi1
+	INC := -I../include -I/usr/include/libftdi1
 endif
 LIB := -lm -l$(LIBFTDI)
 
-all: executable
-
-debug: CXXFLAGS += -DDEBUG -g
-debug: executable
-
-executable: $(OBJECTS)
+$(TARGET): $(OBJECTS)
 	@echo "Linking..."
 	@echo "$(CXX) $^ -o $(TARGET) $(LIB)"; $(CXX) $^ -o $(TARGET) $(LIB)
 

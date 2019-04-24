@@ -32,11 +32,10 @@ class Board:
 
     def measure(self, N='10'):
         subprocess.call(
-            [PATH + '/bin/main', '-l', '-N', N]
+            [PATH + '/bin/main', '--all', '-N', N]
         )
-        files = glob(PATH+'/data/*.dat')
+        files = glob(PATH+'/data/readings/*.json')
         data = Data(self.ID, files[-1])
-        data.getDataFrame()
         data.uploadDataToDB()
         cols = ['timestamp'] + list(data.df.columns)
         row = [data.timestring] + list(data.df.mean().values)

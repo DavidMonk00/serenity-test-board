@@ -13,7 +13,7 @@ default_voltages = pd.DataFrame([{
     'SERVICES+1.0V': 1.0,
     'SERVICES+1.8V': 1.8,
     'SERVICES+3.3V': 3.3,
-    '5V_SCALED': 5,
+    '5V_SCALED': 5.0,
     'X1_POWER_VCCINT': 0.8,
     'X1_POWER_MGTVCCAUC_S': 1.8,
     'X1_POWER_+1.8V_ANALOGUE': 1.8,
@@ -34,6 +34,41 @@ default_voltages = pd.DataFrame([{
     'X0_POWER_MGTAVCC_S': 0.8,
     'X0_POWER_MGTAVTT_S': 1.2
 }])
+
+default_voltages_list = [
+    1.8,
+    1.2,
+    0.8,
+    0.8,
+    1.2,
+    1.8,
+    1.8,
+    3.3,
+    1.5,
+    1.0,
+    1.8,
+    3.3,
+    5.0,
+    0.8,
+    1.8,
+    1.8,
+    1.8,
+    1.8,
+    1.8,
+    0.8,
+    3.3,
+    1.2,
+    1.0,
+    3.3,
+    0.0,
+    12.0,
+    1.8,
+    1.8,
+    1.2,
+    0.8,
+    0.8,
+    1.2
+]
 
 CHANNEL_LISTS = {
     'services': [

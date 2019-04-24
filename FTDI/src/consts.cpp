@@ -17,15 +17,12 @@ const uint32_t I2C_MUX_CH7 = 0x80;
 
 /* ADC */
 const uint32_t ADC_ADDR  = 0x60;
-
 const float ADC_REF_V = 4.096;//4.18125;//4.116; // adc reference in volt
 const float ADC_OFFSET = 0.20;
 
 /* analog MUXs */
-
 const uint32_t MUX_GND_I2C_LINE = 0x01; // on I2C line 0 (same as I2C_MUX_CH0)
 const uint32_t MUX_GND_ADDR = 0x90; // on I2C line 0
-
 const uint32_t MUX_ANALOG_I2C_LINE = 0x02; // on I2C line 1 (same as I2C_MUX_CH1)
 const uint32_t MUX_ANALOG_ADDR[4] = { 0x90, 0x92, 0x94, 0x96 };
 

@@ -10,7 +10,6 @@ extern const uint32_t I2C_RD;
 
 /* I2C MUX */
 extern const uint32_t I2C_MUX_ADDR;
-
 extern const uint32_t I2C_MUX_CH0;
 extern const uint32_t I2C_MUX_CH1;
 extern const uint32_t I2C_MUX_CH2;
@@ -22,15 +21,12 @@ extern const uint32_t I2C_MUX_CH7;
 
 /* ADC */
 extern const uint32_t ADC_ADDR;
-
 extern const float ADC_REF_V; // adc reference in volt
 extern const float ADC_OFFSET;
 
 /* analog MUXs */
-
 extern const uint32_t MUX_GND_I2C_LINE; // on I2C line 0 (same as I2C_MUX_CH0)
 extern const uint32_t MUX_GND_ADDR; // on I2C line 0
-
 extern const uint32_t MUX_ANALOG_I2C_LINE; // on I2C line 1 (same as I2C_MUX_CH1)
 extern const uint32_t MUX_ANALOG_ADDR[4];
 

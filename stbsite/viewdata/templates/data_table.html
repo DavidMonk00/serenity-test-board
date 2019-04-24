@@ -1,5 +1,9 @@
 {% extends "base_table.html" %}
 
+{% block table-name %}
+    'data-table'
+{% endblock %}
+
 {% block table-body %}
 {{ block.super }}
 <tfoot>
@@ -8,7 +12,7 @@
             {% if forloop.counter0|divisibleby:table_width %}
             <td>Mean</td>
             {% else %}
-            <td>{{column}}</td>
+            <td>{{column.0}}</td>
             {% endif %}
         {% endfor %}
     </tr>

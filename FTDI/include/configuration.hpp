@@ -4,12 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+#include <stdexcept>
 
 #include "consts.hpp"
-#include "FTDI.hpp"
-//#include "I2CIO.hpp"
+#include "FT2232H.hpp"
 
-int selectI2Cline(FTDI* i2c, uint32_t line );
-int select_MUX_GND_channel(FTDI* i2c, uint32_t ch );
-int select_MUX_ANALOG_channel(FTDI* i2c, uint32_t muxID, uint32_t ch );
-int config(FTDI* i2c, int gndMuxCH, int analogMuxId, int analogMuxCh );
+void selectI2Cline(FT2232H* ftdi, uint32_t line );
+void select_MUX_GND_channel(FT2232H* ftdi, uint32_t ch );
+void select_MUX_ANALOG_channel(FT2232H* ftdi, uint32_t muxID, uint32_t ch );
+void config(FT2232H* ftdi, int gndMuxCH, int analogMuxId, int analogMuxCh );

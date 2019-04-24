@@ -1,8 +1,9 @@
 $(document).ready(function(){
-   var $form = $('form');
-   $form.submit(function(){
-      $('#data').html('')
-      $.get($(this).attr('action'), $(this).serialize(), function(response){
+    var $form = $('form');
+    $form.submit(function(){
+        $('#data').html('')
+        $.get($(this).attr('action'), $(this).serialize(), function(response){
+            console.log(response);
             var html = '<thead><tr>';
             for (var i = 0; i < response.header.length; i++) {
                 html += '<th>' + response.header[i] + '</th>';
@@ -20,7 +21,21 @@ $(document).ready(function(){
                 if (i == 0) {
                     html += '<td>' + 'Mean' + '</td>';
                 } else {
-                    html += '<td>' + response.footer[i] + '</td>';
+                    html += '<td '
+                    switch(response.footer[i][1]) {
+                        case 0:
+                            html += "style='color:green'"
+                            break;
+                        case 1:
+                            html += "style='color:#af9500'"
+                            break;
+                        case 2:
+                            html += "style='color:red'"
+                            break;
+                        default:
+                            break;
+                    }
+                    html += '>' + response.footer[i][0] + '</td>';
                 }
             }
             html += '</tr></tfoot>';

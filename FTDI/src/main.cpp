@@ -1,14 +1,6 @@
-/*
-
-   !!! YOU MUST RUN AS ROOT !!!
-
- */
-
 #include "main.hpp"
 
 int main(int argc, char** argv) {
-
-    /* */
     int readFlag  = 0;
     int readADCflag  = 0;
     int writeFlag = 0;
@@ -21,7 +13,7 @@ int main(int argc, char** argv) {
     int mux_label_flag = 0;
 
     char data = 0x00;
-    int  ndata = 1; // numer of bites to read
+    int  ndata = 1; // numer of bytes to read
     char addr = 0x00;
     int port = 1025; // port for external communication
     int npoints = 10;
@@ -31,14 +23,14 @@ int main(int argc, char** argv) {
     /* options */
     int opt;
     const struct option longOptions[] = {
-        {"help"          ,  no_argument     ,  0, 'h'},
-        {"read"          , required_argument,  0, 'r'},
-        {"write"         , required_argument,  0, 'w'},
+        {"help"          , no_argument,        0, 'h'},
+        {"read"          , no_argument,        0, 'r'},
+        {"write"         , no_argument,        0, 'w'},
         {"addr"          , required_argument,  0, 'a'},
         {"data"          , required_argument,  0, 'd'},
         {"ndata"         , required_argument,  0, 'n'},
-        {"adc"           , required_argument,  0, 'c'},
-        {"loop"          , required_argument,  0, 'l'},
+        {"adc"           , no_argument,        0, 'c'},
+        {"all"           , no_argument,        0, 'l'},
         {"transmit"      , required_argument,  0, 't'},
         {"data-points"   , required_argument,  0, 'N'},
         {"single"        , required_argument,  0, 's'},
@@ -62,7 +54,7 @@ int main(int argc, char** argv) {
             printf( "d(--data  ) <data>: \t data to write (hex).\n" );
             printf( "n(--ndata ) <ndata>: \t number of data bytes to read (int).\n" );
             printf( "c(--adc   ) : \t returns the ADC conversion in V.\n" );
-            printf( "l(--loop  ) : \t returns all the voltages on each mux.\n" );
+            printf( "l(--all  ) : \t returns all the voltages on each mux.\n" );
             printf( "t(--transmit): <port> \t will continuosly transmit data to <port>.\n" );
             printf( "N(--data-points): <npoints> \t number of points to loop through for each reading.\n" );
             printf( "s(--single) <label>: \t read mux of given label.\n" );
@@ -122,60 +114,41 @@ int main(int argc, char** argv) {
     }
 
     /* I2C interface */
-    // struct mpsse_context *i2c = NULL;
-    FT2232H* ftdi = new FT2232H();
-    if(ftdi->i2c_enable) {
-        /* write to device */
-        if( writeFlag==1 ) {
-            std::vector<uint8_t> NULL_READ_VECTOR;
-            ftdi->i2c->send(addr|I2C_WR, {(uint8_t)data}, NULL_READ_VECTOR);
-        }
-
-        /* read to device */
-        if( readFlag==1 ) {
-            std::vector<uint8_t> rData;
-            rData.resize(ndata);
-            ftdi->i2c->send(addr|I2C_RD, {}, rData);
-            printf("Reading operation done, data read:\n");
-            for(auto i : rData) {
-                printf("0x%x\n", i);
-            }
-        }
-
-        /* read ADC */
-        if( readADCflag == 1 ) {
-            int i;
-            for (i = 0; i < npoints; i++) {
-                float adcRes = ftdi->readADC();
-                printf("ADC reading: %f V\n", adcRes);
-            }
-        }
-
-        if (singleReadFlag == 1) {
-            ftdi->singleReading(label, npoints);
-        }
-
-        /* loop */
-        if( loopFlag == 1 ) {
-            printf("All voltages on Serenity (in Volt):\n");
-            ftdi->loopOverChannels(npoints);
-            // printf("%s\n", buffer);
-            ftdi->writeToFile();
-            return 0;
-        }
-
-        if (muxConfigFlag) {
-            ftdi->selectMuxChannel(mux_index, channel_index);
-            return 0;
-        }
-
-        if (mux_label_flag) {
-            ftdi->selectMuxChannel(label);
-            return 0;
-        }
-
-        delete ftdi;
-        return 0 ;
+    SerenityTestBoard* stb = new SerenityTestBoard();
+    if( writeFlag==1 ) {
+        std::vector<uint8_t> NULL_READ_VECTOR;
+        stb->ftdi->send(addr|I2C_WR, {(uint8_t)data}, NULL_READ_VECTOR);
     }
-    return 0;
+
+    if(readFlag==1) {
+        std::vector<uint8_t> rData;
+        rData.resize(ndata);
+        stb->ftdi->send(addr|I2C_RD, {}, rData);
+        printf("Reading operation done, data read:\n");
+        for(auto i : rData) {
+            printf("0x%x\n", i);
+        }
+    }
+
+    if(readADCflag == 1) {
+        int i;
+        for (i = 0; i < npoints; i++) {
+            float adcRes = stb->readADC();
+            printf("ADC reading: %f V\n", adcRes);
+        }
+    }
+
+    if (singleReadFlag == 1) stb->singleReading(label, npoints);
+
+    if(loopFlag ==1 ) {
+        stb->loopOverChannels(npoints);
+        stb->writeToFile();
+    }
+
+    if (muxConfigFlag) stb->selectMuxChannel(mux_index, channel_index);
+
+    if (mux_label_flag) stb->selectMuxChannel(label);
+
+    delete stb;
+    return 0 ;
 }

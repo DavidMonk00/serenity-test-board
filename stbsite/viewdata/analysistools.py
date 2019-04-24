@@ -3,6 +3,7 @@ import pandas as pd
 from datetime import datetime
 from .board import Board
 from .main import getBoards
+from .values import default_voltages_list
 
 
 def getBoard(board_id):
@@ -31,9 +32,30 @@ def custom_strftime(format, t):
 
 
 def getFooterStats(data):
+    tolerance = 0.05
     np_data = np.array(data)
     mean = np.mean(np_data, axis=0)
     std = np.std(np_data, axis=0)
-    footer = [
-        "%0.3f (%0.3f)" % (mean[i], std[i]) for i in range(len(np_data.T))]
+    footer = []
+    print(len(np_data.T))
+    score = [0]
+    for i in range(len(default_voltages_list)):
+        if (
+            abs(mean[i+1]-default_voltages_list[i]) /
+            default_voltages_list[i] < tolerance
+        ):
+            score.append(0)
+        elif (
+            default_voltages_list[i] > (mean[i+1] - std[i+1]) and
+            default_voltages_list[i] < (mean[i+1] + std[i+1])
+        ):
+            score.append(1)
+        else:
+            score.append(2)
+
+    for i in range(len(np_data.T)):
+        footer.append([
+            "%0.3f (%0.3f)" % (mean[i], std[i]),
+            score[i]
+        ])
     return footer

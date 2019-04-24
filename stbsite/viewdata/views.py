@@ -90,7 +90,7 @@ def deleteBoard(request):
 
 
 def getMostRecentMeasurement(request):
-    if (request.GET.get('type') == "services"):
+    if (request.GET.get('type') == "all"):
         board = getBoard(int(request.GET.get('boards')))
         board.measure(request.GET.get('measurement-slider'))
         context = displayDataTable(board.listMeasurements)
