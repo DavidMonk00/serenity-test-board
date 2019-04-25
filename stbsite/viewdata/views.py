@@ -20,7 +20,8 @@ def index(request):
 
 
 def board(request, board_id):
-    context = displayDataTable(getBoard(board_id).listMeasurements)
+    context = {}
+    context['all'] = displayDataTable(getBoard(board_id).listMeasurements)
     context['board_id'] = board_id
     return render(request, 'board.html', context)
 
@@ -92,11 +93,12 @@ def deleteBoard(request):
 def getMostRecentMeasurement(request):
     if (request.GET.get('type') == "all"):
         board = getBoard(int(request.GET.get('boards')))
-        board.measure(request.GET.get('measurement-slider'))
+        board.measure(
+            request.GET.get('type'),
+            request.GET.get('measurement-slider'))
         context = displayDataTable(board.listMeasurements)
         recent = board.listMeasurements().timestamp
         context['header'] = ['Measurement Number'] + context['header'][1:]
-
         data = [list(i) for i in viewTable(
             PATH+'/data/db.sqlite',
             "%s_test_%s" % (request.GET.get('boards'), recent.max())

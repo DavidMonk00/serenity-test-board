@@ -41,6 +41,10 @@
     <div style="padding-bottom: 20px">
         <button type="button" name="button" onclick="deleteBoard()">Delete Board</button>
     </div>
-    {% include "board_table.html" %}
+    <h3>All</h3>
+    {% include "board_table.html"  with results=all.results header=all.header table_width=all.table_width%}
+    <h3>Services</h3>
+    <h3>X0</h3>
+    <h3>X1</h3>
 </body>
 {% endblock body %}

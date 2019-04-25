@@ -30,15 +30,15 @@ class Board:
                              con=engine, if_exists='append',
                              index=False)
 
-    def measure(self, N='10'):
+    def measure(self, type='all', N='10'):
         subprocess.call(
-            [PATH + '/bin/main', '--all', '-N', N]
+            [PATH + '/bin/main', '--%s' % type, '-N', N]
         )
-        files = glob(PATH+'/data/readings/*.json')
+        files = glob(PATH+'/data/readings/%s*.json' % type)
         data = Data(self.ID, files[-1])
         data.uploadDataToDB()
         cols = ['timestamp'] + list(data.df.columns)
-        row = [data.timestring] + list(data.df.mean().values)
+        row = ["%s" % (data.timestring)] + list(data.df.mean().values)
         self.data_row = pd.DataFrame([row], columns=cols)
         self.__uploadToBoardTable(self.data_row)
 
