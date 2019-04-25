@@ -1,5 +1,6 @@
 import sqlalchemy
 import subprocess
+import pandas as pd
 
 
 def listTables(dbname):
@@ -14,7 +15,8 @@ def dropTable(dbname, table):
 
 def viewTable(dbname, table):
     engine = sqlalchemy.create_engine('sqlite:///'+dbname, echo=False)
-    return engine.execute("SELECT * FROM '%s'" % table).fetchall()
+    return pd.read_sql(table, engine, index_col="index")
+    # return engine.execute("SELECT * FROM '%s'" % table).fetchall()
 
 
 if __name__ == '__main__':

@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <utility>
+#include <vector>
 
 #define NUMBER_OF_CHANNELS 32
 
@@ -36,6 +38,18 @@ extern const uint32_t MUX_CH[8];
 
 extern const char *MUX_LABLES[4][8];
 extern const char *MUX_DISPLAY_LABLES[4][8];
+
+const std::vector<std::pair<int, int> > SERVICES_CHANNELS = {
+    {1, 0},
+    {1, 1},
+    {1, 2},
+    {1, 3},
+    {1, 4},
+    {2, 5},
+    {2, 6},
+    {2, 7},
+    {3, 1}
+};
 
 extern const int GND_MUX[4][8];
 

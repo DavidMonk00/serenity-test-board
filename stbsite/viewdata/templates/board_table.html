@@ -2,7 +2,7 @@
 
 {% block nav-column %}
 {% if forloop.counter0|divisibleby:table_width %}
-<td><a href="/viewdata/boards/{{board_id}}/data/{{column}}">{{column}}</a></td>
+<td><a href="/viewdata/boards/{{board_id}}/data/{{prefix}}/{{column}}">{{column}}</a></td>
 {% else %}
 <td>{{column}}</td>
 {% endif %}

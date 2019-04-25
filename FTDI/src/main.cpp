@@ -11,6 +11,7 @@ int main(int argc, char** argv) {
     int mux_index = 0;
     int channel_index = 0;
     int mux_label_flag = 0;
+    int services_flag = 0;
 
     char data = 0x00;
     int  ndata = 1; // numer of bytes to read
@@ -37,6 +38,7 @@ int main(int argc, char** argv) {
         {"mux"           , required_argument,  0, 'm'},
         {"channel"       , required_argument,  0, 'x'},
         {"label"         , required_argument,  0, 'L'},
+        {"services"      , no_argument,        0, 'S'},
         {0,0,0,0}
     };
 
@@ -61,6 +63,7 @@ int main(int argc, char** argv) {
             printf( "m(--mux  ) <index>: \t Index of mux to select.\n" );
             printf( "x(--channel  ) <index>: \t Index of channel to select.\n" );
             printf( "L(--label) <label> \t configure muxes to select given label.\n");
+            printf( "S(--services ) : \t returns all the services voltages.\n" );
             return 0;
             break;
         case 'r':
@@ -108,6 +111,9 @@ int main(int argc, char** argv) {
             mux_label_flag = 1;
             label = optarg;
             break;
+        case 'S':
+            services_flag = 1;
+            break;
         default:
             return 0;
         }
@@ -141,8 +147,20 @@ int main(int argc, char** argv) {
     if (singleReadFlag == 1) stb->singleReading(label, npoints);
 
     if(loopFlag == 1) {
-        stb->loopOverChannels(npoints);
+        std::vector<std::pair<int, int> > v;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 8; j++) {
+                v.push_back({i, j});
+            }
+        }
+        stb->loopOverChannels(v, npoints);
         stb->writeToFile("all");
+    }
+
+    if (services_flag) {
+        for (auto i : SERVICES_CHANNELS) {
+            std::cout << i.first << i.second << '\n';
+        }
     }
 
     if (muxConfigFlag) stb->selectMuxChannel(mux_index, channel_index);

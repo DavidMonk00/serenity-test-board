@@ -1,9 +1,7 @@
 import numpy as np
-import pandas as pd
-from datetime import datetime
 from .board import Board
 from .main import getBoards
-from .values import default_voltages_list
+from .values import default_voltages
 
 
 def getBoard(board_id):
@@ -37,24 +35,24 @@ def getFooterStats(data):
     mean = np.mean(np_data, axis=0)
     std = np.std(np_data, axis=0)
     footer = []
-    score = [0]
-    for i in range(len(default_voltages_list)):
+    score = []
+    for column in data:
+        mean = data[column].mean()
+        std = data[column].std()
         if (
-            abs(mean[i+1]-default_voltages_list[i]) /
-            default_voltages_list[i] < tolerance
+            abs(mean-default_voltages[column].loc[0]) /
+            default_voltages[column].loc[0] < tolerance
         ):
-            score.append(0)
+            score = 0
         elif (
-            default_voltages_list[i] > (mean[i+1] - std[i+1]) and
-            default_voltages_list[i] < (mean[i+1] + std[i+1])
+            default_voltages[column].loc[0] > (mean - std) and
+            default_voltages[column].loc[0] < (mean - std)
         ):
-            score.append(1)
+            score = 1
         else:
-            score.append(2)
-
-    for i in range(len(np_data.T)):
+            score = 2
         footer.append([
-            "%0.3f (%0.3f)" % (mean[i], std[i]),
-            score[i]
+            "%0.3f (%0.3f)" % (mean, std),
+            score
         ])
     return footer

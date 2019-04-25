@@ -36,7 +36,7 @@ Reading SerenityTestBoard::readChannel(int nPoints, int imux, int ich) {
     return reading;
 }
 
-std::unordered_map<std::string, Reading> SerenityTestBoard::loopOverChannels(int nPoints) {
+std::unordered_map<std::string, Reading> SerenityTestBoard::loopOverChannels(std::vector<std::pair<int, int> > channel_list, int nPoints) {
     sprintf(buffer, "%d,", nPoints);
     #ifdef DEBUG
     printf("All voltages on Serenity (in Volt):\n");
@@ -91,7 +91,6 @@ void SerenityTestBoard::writeToFile(std::string reading_type) {
     std::ostringstream os;
     os << path << reading_type << "_" << buff << ".json";
     std::ofstream file;
-    std::cout << os.str() << '\n';
     file.open(os.str());
     file << "{";
     for (auto i : readings) {

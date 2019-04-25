@@ -25,7 +25,7 @@ default_voltages = pd.DataFrame([{
     'ARTIX_MGTAVTT': 1.2,
     'ARTIX_MGTAVCC': 1.0,
     'SERVICES_POWER_STANDBY_+3.3V': 3.3,
-    'Not Used': 0.0,
+    'Not Used': 1.0,  # FLOATING
     '+12_SCALED': 12.0,
     'X0_POWER_+1.8V': 1.8,
     'X0_POWER_VCCAUX': 1.8,
@@ -60,7 +60,7 @@ default_voltages_list = [
     1.2,
     1.0,
     3.3,
-    0.0,
+    1.0,
     12.0,
     1.8,
     1.8,

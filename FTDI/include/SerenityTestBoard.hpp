@@ -15,6 +15,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <utility>
 
 #include "FT2232H.hpp"
 #include "consts.hpp"
@@ -35,7 +36,7 @@ public:
     virtual ~SerenityTestBoard (void);
 
     float readADC(void);
-    std::unordered_map<std::string, Reading> loopOverChannels(int nPoints);
+    std::unordered_map<std::string, Reading> loopOverChannels(std::vector<std::pair<int, int> > channel_list, int nPoints);
     void singleReading(char* mux_label, int nPoints);
     void writeToFile(std::string reading_type);
     void selectMuxChannel(int imux, int ich);

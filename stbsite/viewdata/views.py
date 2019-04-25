@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 
 from datetime import datetime
-import numpy as np
 
 from .main import getBoards, createBoard
 from .databasing import viewTable
@@ -10,8 +9,6 @@ from .values import PATH
 from .diagnostics import Diagnostics
 from .analysistools import custom_strftime, displayDataTable, getBoard
 from .analysistools import getFooterStats
-
-# Create your views here.
 
 
 def index(request):
@@ -26,21 +23,21 @@ def board(request, board_id):
     return render(request, 'board.html', context)
 
 
-def data(request, board_id, timestring):
-    context = displayDataTable(getBoard(board_id).listMeasurements)
+def data(request, board_id, timestring, type):
+    context = {}
     date_fmt = datetime.strptime(timestring, '%Y%m%d%H%M%S')
     context['date_fmt'] = custom_strftime(
         '%A {S} %B %Y at %-I:%M:%S %p',
         date_fmt)
     context['board_id'] = board_id
     context['timestring'] = timestring
-    context['header'] = ['Measurement Number'] + context['header'][1:]
-
     data = viewTable(
         PATH+'/data/db.sqlite',
-        "%d_test_%s" % (board_id, timestring)
+        "%d_%s_%s" % (board_id, type, timestring)
     )
-    context['results'] = data
+    context['header'] = ['Measurement Number'] + data.columns.tolist()[1:]
+    context['results'] = data.values.tolist()
+    context['table_width'] = len(list(data.columns))
     context['footer'] = getFooterStats(data)
     return render(request, 'data.html', context)
 
@@ -99,11 +96,16 @@ def getMostRecentMeasurement(request):
         context = displayDataTable(board.listMeasurements)
         recent = board.listMeasurements().timestamp
         context['header'] = ['Measurement Number'] + context['header'][1:]
-        data = [list(i) for i in viewTable(
+        data = viewTable(
             PATH+'/data/db.sqlite',
-            "%s_test_%s" % (request.GET.get('boards'), recent.max())
-        )]
-        context['results'] = data
+            "%s_%s_%s" % (
+                request.GET.get('boards'),
+                request.GET.get('type'),
+                recent.max())
+        )
+        context['header'] = ['Measurement Number'] + data.columns.tolist()[1:]
+        context['results'] = data.values.tolist()
+        context['table_width'] = len(list(data.columns))
         context['footer'] = getFooterStats(data)
     else:
         context = {}
