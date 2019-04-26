@@ -1,0 +1,51 @@
+{% extends "request/base.html" %}
+{% load static from staticfiles %}
+
+{% block style %}
+{% endblock style %}
+
+{% block script %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+{% endblock script %}
+
+{% block title %}
+<title>CUtS</title>
+{% endblock title %}
+
+{% block body %}
+<body>
+    <h1>CUtS</h1>
+    <h2>Request a film</h2>
+    <form class="request-film" action="" method="get">
+        <table>
+            <tr>
+                <td>Film name:</td>
+                <td><input name="film-name" id="film-name" type="text" value=""></td>
+            </tr>
+            <tr>
+                <td>Year released:</td>
+                <td><input name="film-year" id="film-year" type="text" value=""></td>
+            </tr>
+        </table>
+        <input type="submit" value="Submit">
+    </form>
+    <h2>Request a TV Show</h2>
+    <form class="request-tv" action="" method="get">
+        <table>
+            <tr>
+                <td>TV show name:</td>
+                <td><input name="tv-name" id="tv-name" type="text" value=""></td>
+            </tr>
+            <tr>
+                <td>Year first released:</td>
+                <td><input name="tv-year" id="tv-year" type="text" value=""></td>
+            </tr>
+            <tr>
+                <td>Series (e.g. '1-3' or 'all')</td>
+                <td><input name="tv-series" id="tv-series" type="text" value=""></td>
+            </tr>
+        </table>
+        <input type="submit" value="Submit">
+    </form>
+</body>
+{% endblock body %}

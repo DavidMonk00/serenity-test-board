@@ -158,9 +158,8 @@ int main(int argc, char** argv) {
     }
 
     if (services_flag) {
-        for (auto i : SERVICES_CHANNELS) {
-            std::cout << i.first << i.second << '\n';
-        }
+        stb->loopOverChannels(SERVICES_CHANNELS, npoints);
+        stb->writeToFile("services");
     }
 
     if (muxConfigFlag) stb->selectMuxChannel(mux_index, channel_index);

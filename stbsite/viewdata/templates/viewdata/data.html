@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "viewdata/base.html" %}
 {% load static from staticfiles %}
 
 {% block style %}
@@ -19,6 +19,6 @@
     <h1>Serenity Test Card</h1>
     <h2>Board ID: {{board_id}}</h2>
     <h3>Measurement taken: {{date_fmt}}</h3>
-    {% include "data_table.html" with results=results footer=footer header=header %}
+    {% include "viewdata/data_table.html" with results=results footer=footer header=header %}
 </body>
 {% endblock body %}

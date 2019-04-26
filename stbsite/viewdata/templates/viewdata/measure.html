@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "viewdata/base.html" %}
 {% load static from staticfiles %}
 
 {% block style %}
@@ -22,7 +22,7 @@
     >> <a href="/viewdata/measure">Measure</a>
     {% endblock nav-bar %}
     <h1>Serenity Test Card</h1>
-    {% include "index_table.html" %}
+    {% include "viewdata/index_table.html" %}
     <form id="board-select" class="board" action="/viewdata/get-measurement" method="GET">
         <table>
             <tr>

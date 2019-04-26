@@ -26,7 +26,6 @@
 class SerenityTestBoard {
 private:
     std::unordered_map<std::string, Reading> readings;
-    char buffer[100000];
     Reading readChannel(int nPoints, int imux, int ich);
 
 public:

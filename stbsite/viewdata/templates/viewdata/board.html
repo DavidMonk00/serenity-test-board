@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "viewdata/base.html" %}
 {% load static from staticfiles %}
 
 {% block style %}
@@ -42,7 +42,7 @@
         <button type="button" name="button" onclick="deleteBoard()">Delete Board</button>
     </div>
     <h3>All</h3>
-    {% include "board_table.html"  with prefix="all" results=all.results header=all.header table_width=all.table_width%}
+    {% include "viewdata/board_table.html"  with prefix="all" results=all.results header=all.header table_width=all.table_width%}
     <h3>Services</h3>
     <h3>X0</h3>
     <h3>X1</h3>

@@ -13,14 +13,14 @@ from .analysistools import getFooterStats
 
 def index(request):
     context = displayDataTable(getBoards)
-    return render(request, 'index.html', context)
+    return render(request, 'viewdata/index.html', context)
 
 
 def board(request, board_id):
     context = {}
     context['all'] = displayDataTable(getBoard(board_id).listMeasurements)
     context['board_id'] = board_id
-    return render(request, 'board.html', context)
+    return render(request, 'viewdata/board.html', context)
 
 
 def data(request, board_id, timestring, type):
@@ -39,7 +39,7 @@ def data(request, board_id, timestring, type):
     context['results'] = data.values.tolist()
     context['table_width'] = len(list(data.columns))
     context['footer'] = getFooterStats(data)
-    return render(request, 'data.html', context)
+    return render(request, 'viewdata/data.html', context)
 
 
 def checkFTDIStatus(request):
@@ -62,14 +62,14 @@ def checkI2CStatus(request):
 def measure(request):
     context = displayDataTable(getBoards)
     context['boards'] = getBoards().values
-    return render(request, 'measure.html', context)
+    return render(request, 'viewdata/measure.html', context)
 
 
 def newBoard(request):
     context = {
         'timestring': datetime.strftime(datetime.now(), '%Y%m%d')
     }
-    return render(request, 'new-board.html', context)
+    return render(request, 'viewdata/new-board.html', context)
 
 
 def submitNewBoard(request):

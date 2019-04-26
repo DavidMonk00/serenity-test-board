@@ -37,27 +37,20 @@ Reading SerenityTestBoard::readChannel(int nPoints, int imux, int ich) {
 }
 
 std::unordered_map<std::string, Reading> SerenityTestBoard::loopOverChannels(std::vector<std::pair<int, int> > channel_list, int nPoints) {
-    sprintf(buffer, "%d,", nPoints);
     #ifdef DEBUG
     printf("All voltages on Serenity (in Volt):\n");
     #endif
-    for(int imux = 0; imux < 4; imux++) {
-        for(int ich = 0; ich <8; ich++) {
-            readings[MUX_LABLES[imux][ich]] = readChannel(nPoints, imux, ich);
-            #ifdef DEBUG
-            printf("%s\t", MUX_DISPLAY_LABLES[imux][ich] );
-            printf("MUX %d \t CH %d \t ADC_RD %f ( %f )\n",
-                   imux, ich, readings[MUX_LABLES[imux][ich]].getMean(),
-                   readings[MUX_LABLES[imux][ich]].getStd());
-            #endif
-        }
-    }
-    for (int i = 0; i < NUMBER_OF_CHANNELS; i++) {
-      sprintf(buffer, "%s%s,", buffer, MUX_DISPLAY_LABLES[i / 8][i % 8]);
-      for(int j = 0; j < nPoints ; j++) {
-          sprintf(buffer, "%s%f,", buffer,
-                  readings[MUX_LABLES[i / 8][i % 8]].getData()[j]);
-      }
+    int imux, ich;
+    for (auto i : channel_list) {
+        imux = i.first;
+        ich = i.second;
+        readings[MUX_LABLES[imux][ich]] = readChannel(nPoints, imux, ich);
+        #ifdef DEBUG
+        printf("%s\t", MUX_DISPLAY_LABLES[imux][ich] );
+        printf("MUX %d \t CH %d \t ADC_RD %f ( %f )\n",
+               imux, ich, readings[MUX_LABLES[imux][ich]].getMean(),
+               readings[MUX_LABLES[imux][ich]].getStd());
+        #endif
     }
     return readings;
 }

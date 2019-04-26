@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "viewdata/base.html" %}
 {% load static from staticfiles %}
 
 {% block style %}
@@ -21,7 +21,7 @@
     {% endblock nav-bar %}
     <h1>Serenity Test Card</h1>
     <h2>Tested Cards</h2>
-    {% include "index_table.html" %}
+    {% include "viewdata/index_table.html" %}
     <h2>Status</h2>
     <div class="test-buttons" style="padding-bottom:20px">
         <button type="button" id="test-i2c" onclick="checkI2CStatus()">Test I2C line</button>
