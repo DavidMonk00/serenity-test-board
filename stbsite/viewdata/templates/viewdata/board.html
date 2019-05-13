@@ -2,7 +2,7 @@
 {% load static from staticfiles %}
 
 {% block style %}
-<link rel="stylesheet" href="{% static "viewdata/css/base_table.css" %}">
+<link rel="stylesheet" href="{% static 'viewdata/css/base_table.css' %}">
 {% endblock style %}
 
 {% block script %}
@@ -31,6 +31,7 @@
 {% endblock title %}
 
 {% block body %}
+
 <body>
     {% block nav-bar %}
     >> <a href="/viewdata/">Home</a>
@@ -42,9 +43,12 @@
         <button type="button" name="button" onclick="deleteBoard()">Delete Board</button>
     </div>
     <h3>All</h3>
-    {% include "viewdata/board_table.html"  with prefix="all" results=all.results header=all.header table_width=all.table_width%}
+    {% include "viewdata/board_table.html" with prefix="all" results=all.results header=all.header table_width=all.table_width%}
     <h3>Services</h3>
+    {% include "viewdata/board_table.html" with prefix="services" results=services.results header=services.header table_width=services.table_width%}
     <h3>X0</h3>
+    {% include "viewdata/board_table.html" with prefix="x0" results=x0.results header=x0.header table_width=x0.table_width%}
     <h3>X1</h3>
+    {% include "viewdata/board_table.html" with prefix="x1" results=x1.results header=x1.header table_width=x1.table_width%}
 </body>
 {% endblock body %}

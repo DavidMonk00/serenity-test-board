@@ -23,16 +23,16 @@ class Board:
             if ('%s_' % self.ID) in i:
                 dropTable(PATH+'/data/db.sqlite', i)
 
-    def __uploadToBoardTable(self, df):
+    def __uploadToBoardTable(self, df, type):
         engine = sqlalchemy.create_engine(
             DB_PATH, echo=False)
-        self.data_row.to_sql('board_' + self.ID,
+        self.data_row.to_sql('board_' + self.ID + "_" + type,
                              con=engine, if_exists='append',
                              index=False)
 
     def measure(self, type='all', N='10'):
         subprocess.call(
-            [PATH + '/bin/main', '--%s' % type, '-N', N]
+            [PATH + '/bin/main', '--list', '%s' % type, '-N', N]
         )
         files = glob(PATH+'/data/readings/%s*.json' % type)
         data = Data(self.ID, files[-1])
@@ -40,13 +40,13 @@ class Board:
         cols = ['timestamp'] + list(data.df.columns)
         row = ["%s" % (data.timestring)] + list(data.df.mean().values)
         self.data_row = pd.DataFrame([row], columns=cols)
-        self.__uploadToBoardTable(self.data_row)
+        self.__uploadToBoardTable(self.data_row, type)
 
-    def listMeasurements(self):
+    def listMeasurements(self, type='all'):
         engine = sqlalchemy.create_engine(DB_PATH, echo=False)
         try:
             self.df = pd.read_sql(
-                "SELECT * FROM board_%s" % self.ID, con=engine)
+                "SELECT * FROM board_%s_%s" % (self.ID, type), con=engine)
             return self.df
         except sqlalchemy.exc.OperationalError:
             return pd.DataFrame()

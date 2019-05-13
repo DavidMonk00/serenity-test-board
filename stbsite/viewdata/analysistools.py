@@ -10,8 +10,7 @@ def getBoard(board_id):
     return board
 
 
-def displayDataTable(df_func):
-    df = df_func()
+def displayDataTable(df):
     context = {
         'header': list(df.columns),
         'table_width': len(list(df.columns)),

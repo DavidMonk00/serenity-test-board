@@ -51,6 +51,34 @@ const std::vector<std::pair<int, int> > SERVICES_CHANNELS = {
     {3, 1}
 };
 
+const std::vector<std::pair<int, int> > X0_CHANNELS = {
+    {2, 0},
+    {2, 1},
+    {2, 2},
+    {2, 3},
+    {2, 4},
+    {3, 2},
+    {3, 3},
+    {3, 4},
+    {3, 5},
+    {3, 6},
+    {3, 7}
+};
+
+const std::vector<std::pair<int, int> > X1_CHANNELS = {
+    {0, 0},
+    {0, 1},
+    {0, 2},
+    {0, 3},
+    {0, 4},
+    {0, 5},
+    {0, 6},
+    {0, 7},
+    {1, 5},
+    {1, 6},
+    {1, 7}
+};
+
 extern const int GND_MUX[4][8];
 
 struct channel_reading {

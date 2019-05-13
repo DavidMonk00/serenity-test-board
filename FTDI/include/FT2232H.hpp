@@ -50,6 +50,7 @@ enum interface {
 
 /* Common clock rates */
 enum clock_rates {
+	FIFTY_KHZ = 50000,
 	ONE_HUNDRED_KHZ  = 100000,
 	FOUR_HUNDRED_KHZ = 400000,
 	ONE_MHZ 	 = 1000000,

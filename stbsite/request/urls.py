@@ -6,4 +6,5 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('request-film', views.requestFilm, name='request-film'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <vector>
 #include <utility>
+#include <map>
+#include <iostream>
 
 #include "SerenityTestBoard.hpp"
 #include "consts.hpp"

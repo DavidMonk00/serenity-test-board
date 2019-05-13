@@ -60,6 +60,9 @@ void FT2232H::write(uint8_t addr, const std::vector<uint8_t>& write_data) {
     start();
     writeBytes((char*) &addr, 1);
     if (getAck() != ACK) {
+        #ifdef DEBUG
+        std::cout << "Address to be written: " << addr << '\n';
+        #endif
         throw std::runtime_error("ACK not received after writing address.");
     }
     for (unsigned int i = 0; i < write_data.size(); i++) {

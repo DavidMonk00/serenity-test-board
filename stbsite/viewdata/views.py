@@ -12,13 +12,20 @@ from .analysistools import getFooterStats
 
 
 def index(request):
-    context = displayDataTable(getBoards)
+    context = displayDataTable(getBoards())
     return render(request, 'viewdata/index.html', context)
 
 
 def board(request, board_id):
     context = {}
-    context['all'] = displayDataTable(getBoard(board_id).listMeasurements)
+    context['all'] = displayDataTable(
+        getBoard(board_id).listMeasurements('all'))
+    context['services'] = displayDataTable(
+        getBoard(board_id).listMeasurements('services'))
+    context['x0'] = displayDataTable(
+        getBoard(board_id).listMeasurements('x0'))
+    context['x1'] = displayDataTable(
+        getBoard(board_id).listMeasurements('x1'))
     context['board_id'] = board_id
     return render(request, 'viewdata/board.html', context)
 
@@ -60,7 +67,7 @@ def checkI2CStatus(request):
 
 
 def measure(request):
-    context = displayDataTable(getBoards)
+    context = displayDataTable(getBoards())
     context['boards'] = getBoards().values
     return render(request, 'viewdata/measure.html', context)
 
@@ -88,25 +95,21 @@ def deleteBoard(request):
 
 
 def getMostRecentMeasurement(request):
-    if (request.GET.get('type') == "all"):
-        board = getBoard(int(request.GET.get('boards')))
-        board.measure(
-            request.GET.get('type'),
-            request.GET.get('measurement-slider'))
-        context = displayDataTable(board.listMeasurements)
-        recent = board.listMeasurements().timestamp
-        context['header'] = ['Measurement Number'] + context['header'][1:]
-        data = viewTable(
-            PATH+'/data/db.sqlite',
-            "%s_%s_%s" % (
-                request.GET.get('boards'),
-                request.GET.get('type'),
-                recent.max())
-        )
-        context['header'] = ['Measurement Number'] + data.columns.tolist()[1:]
-        context['results'] = data.values.tolist()
-        context['table_width'] = len(list(data.columns))
-        context['footer'] = getFooterStats(data)
-    else:
-        context = {}
+    type = request.GET.get('type')
+    board = getBoard(int(request.GET.get('boards')))
+    board.measure(type, request.GET.get('measurement-slider'))
+    context = displayDataTable(board.listMeasurements(type))
+    recent = board.listMeasurements(type).timestamp
+    context['header'] = ['Measurement Number'] + context['header'][1:]
+    data = viewTable(
+        PATH+'/data/db.sqlite',
+        "%s_%s_%s" % (
+            request.GET.get('boards'),
+            type,
+            recent.max())
+    )
+    context['header'] = ['Measurement Number'] + data.columns.tolist()[1:]
+    context['results'] = data.values.tolist()
+    context['table_width'] = len(list(data.columns))
+    context['footer'] = getFooterStats(data)
     return JsonResponse(context)

@@ -25,6 +25,7 @@ def createBoard(metadata):
     row = [str(id)] + metadata + [False]
     df = pd.DataFrame([row], columns=cols)
     df.to_sql('boards', con=engine, if_exists='append', index=False)
+    board = Board(str(id))
 
 
 def getBoards():

@@ -19,6 +19,7 @@ int main(int argc, char** argv) {
     int port = 1025; // port for external communication
     int npoints = 10;
     char* label = (char*)"Not Used";
+    char* category = (char*)"services";
 
 
     /* options */
@@ -31,7 +32,7 @@ int main(int argc, char** argv) {
         {"data"          , required_argument,  0, 'd'},
         {"ndata"         , required_argument,  0, 'n'},
         {"adc"           , no_argument,        0, 'c'},
-        {"all"           , no_argument,        0, 'l'},
+        {"list"          , required_argument,  0, 'l'},
         {"transmit"      , required_argument,  0, 't'},
         {"data-points"   , required_argument,  0, 'N'},
         {"single"        , required_argument,  0, 's'},
@@ -86,6 +87,8 @@ int main(int argc, char** argv) {
             break;
         case 'l':
             loopFlag = 1;
+            category = optarg;
+            std::cout << optarg << '\n';
             break;
         case 't':
             port = atoi(optarg);
@@ -147,14 +150,34 @@ int main(int argc, char** argv) {
     if (singleReadFlag == 1) stb->singleReading(label, npoints);
 
     if(loopFlag == 1) {
-        std::vector<std::pair<int, int> > v;
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 8; j++) {
-                v.push_back({i, j});
+        enum category_values {c_all, c_services, c_x0, c_x1};
+        std::map<std::string, category_values> s_mapStringValues;
+        s_mapStringValues["all"] = c_all;
+        s_mapStringValues["services"] = c_services;
+        s_mapStringValues["x0"] = c_x0;
+        s_mapStringValues["x1"] = c_x1;
+        std::string s_category = std::string(category);
+        std::vector<std::pair<int, int> > channels;
+        switch (s_mapStringValues[s_category]) {
+            case c_services:
+            channels = SERVICES_CHANNELS;
+            break;
+            case c_x0:
+            channels = X0_CHANNELS;
+            break;
+            case c_x1:
+            channels = X1_CHANNELS;
+            break;
+            case c_all:
+            for (int i = 0; i < 4; i++) {
+                for (int j = 0; j < 8; j++) {
+                    channels.push_back({i, j});
+                }
             }
+            break;
         }
-        stb->loopOverChannels(v, npoints);
-        stb->writeToFile("all");
+        stb->loopOverChannels(channels, npoints);
+        stb->writeToFile(s_category);
     }
 
     if (services_flag) {

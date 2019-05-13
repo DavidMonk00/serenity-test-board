@@ -1,7 +1,7 @@
 #include "SerenityTestBoard.hpp"
 
 SerenityTestBoard::SerenityTestBoard(void) {
-    ftdi = new FT2232H(0x0403, 0x6010, ONE_HUNDRED_KHZ, IFACE_A);
+    ftdi = new FT2232H(0x0403, 0x6010, FIFTY_KHZ, IFACE_A);
 }
 
 SerenityTestBoard::~SerenityTestBoard(void) {
@@ -14,10 +14,12 @@ float SerenityTestBoard::readADC(void) {
     ftdi->send(ADC_ADDR|I2C_RD, {}, data);
     uint32_t result = ((uint32_t)data[0] & 0xff) << 8;
     result = result | ((uint32_t)data[1] & 0xff);
+    //printf("% 6u % 2x % 2x\n",result, data[0], data[1]);
     return ((float)result) / powf(2,16);
 }
 
 Reading SerenityTestBoard::readChannel(int nPoints, int imux, int ich) {
+  //printf("READING CH mux %d ch %d\n", imux, ich);
     Reading reading = Reading();
     config(ftdi, GND_MUX[imux][ich], imux, ich );
     // Add sleep to allow voltage to settle to value

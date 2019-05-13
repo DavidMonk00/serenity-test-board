@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import sqlalchemy
 import re
 import datetime
@@ -14,8 +13,8 @@ class Data:
     def __openFile(self, filename):
         self.df = pd.read_json(filename)
         self.type = re.match(
-            '[a-z]*',
-            re.search('[a-z]*\_[0-9]*\.json', filename).group()).group()
+            '[a-z0-9]*',
+            re.search('[a-z0-9]*\_[0-9]*\.json', filename).group()).group()
         self.timestring = re.match(
             '[0-9]*',
             re.search('[0-9]*\.json', filename).group()).group()
@@ -27,7 +26,7 @@ class Data:
         engine = sqlalchemy.create_engine(DB_PATH, echo=False)
         try:
             self.df.to_sql(
-                self.board_ID + '_%s_' % self.type + self.timestring,
+                str(self.board_ID) + ('_%s_' % self.type) + self.timestring,
                 con=engine, if_exists='replace',
                 index_label='index')
         except ValueError:
