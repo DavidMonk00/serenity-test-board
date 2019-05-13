@@ -17,15 +17,16 @@ def createBoard(metadata):
     engine = sqlalchemy.create_engine(DB_PATH, echo=False)
     if ('boards' in listTables(PATH+'/data/db.sqlite')):
         df = pd.read_sql("SELECT * FROM boards", con=engine)
-        max_id = df.ID.astype(int).max()
-        id = max_id + 1
+        max_key = df.Key.astype(int).max()
+        key = max_key + 1
     else:
-        id = 0
-    cols = ['ID', 'Version', 'Date Built', 'Deleted']
-    row = [str(id)] + metadata + [False]
+        key = 0
+    cols = ['Key', 'ID', 'Version', 'Date Built', 'Deleted']
+    row = [str(key)] + metadata + [False]
+    print(row)
     df = pd.DataFrame([row], columns=cols)
     df.to_sql('boards', con=engine, if_exists='append', index=False)
-    board = Board(str(id))
+    Board(str(key))
 
 
 def getBoards():

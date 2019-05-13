@@ -69,6 +69,7 @@ def checkI2CStatus(request):
 def measure(request):
     context = displayDataTable(getBoards())
     context['boards'] = getBoards().values
+    print(context)
     return render(request, 'viewdata/measure.html', context)
 
 
@@ -80,7 +81,10 @@ def newBoard(request):
 
 
 def submitNewBoard(request):
-    metadata = [request.GET.get('version'), request.GET.get('timestring')]
+    metadata = [
+        request.GET.get('id'),
+        request.GET.get('version'),
+        request.GET.get('timestring')]
     createBoard(metadata)
     return redirect('/viewdata/measure')
 
@@ -95,17 +99,18 @@ def deleteBoard(request):
 
 
 def getMostRecentMeasurement(request):
-    type = request.GET.get('type')
     board = getBoard(int(request.GET.get('boards')))
-    board.measure(type, request.GET.get('measurement-slider'))
-    context = displayDataTable(board.listMeasurements(type))
-    recent = board.listMeasurements(type).timestamp
+    board.measure(
+        request.GET.get('type'),
+        request.GET.get('measurement-slider'))
+    context = displayDataTable(board.listMeasurements(request.GET.get('type')))
+    recent = board.listMeasurements(request.GET.get('type')).timestamp
     context['header'] = ['Measurement Number'] + context['header'][1:]
     data = viewTable(
         PATH+'/data/db.sqlite',
         "%s_%s_%s" % (
             request.GET.get('boards'),
-            type,
+            request.GET.get('type'),
             recent.max())
     )
     context['header'] = ['Measurement Number'] + data.columns.tolist()[1:]

@@ -10,23 +10,23 @@ import numpy as np
 
 
 class Board:
-    def __init__(self, ID):
-        self.ID = ID
+    def __init__(self, key):
+        self.key = key
 
     def deleteBoard(self):
         engine = sqlalchemy.create_engine(DB_PATH, echo=False)
         engine.execute(
-            "UPDATE '%s' SET Deleted=1 WHERE ID = %s" % ('boards', self.ID)
+            "UPDATE '%s' SET Deleted=1 WHERE Key = %s" % ('boards', self.key)
         )
-        dropTable(PATH+'/data/db.sqlite', 'board_%s' % self.ID)
+        dropTable(PATH+'/data/db.sqlite', 'board_%s' % self.key)
         for i in listTables(PATH+'/data/db.sqlite'):
-            if ('%s_' % self.ID) in i:
+            if ('%s_' % self.key) in i:
                 dropTable(PATH+'/data/db.sqlite', i)
 
     def __uploadToBoardTable(self, df, type):
         engine = sqlalchemy.create_engine(
             DB_PATH, echo=False)
-        self.data_row.to_sql('board_' + self.ID + "_" + type,
+        self.data_row.to_sql('board_' + self.key + "_" + type,
                              con=engine, if_exists='append',
                              index=False)
 
@@ -35,7 +35,7 @@ class Board:
             [PATH + '/bin/main', '--list', '%s' % type, '-N', N]
         )
         files = glob(PATH+'/data/readings/%s*.json' % type)
-        data = Data(self.ID, files[-1])
+        data = Data(self.key, files[-1])
         data.uploadDataToDB()
         cols = ['timestamp'] + list(data.df.columns)
         row = ["%s" % (data.timestring)] + list(data.df.mean().values)
@@ -46,7 +46,7 @@ class Board:
         engine = sqlalchemy.create_engine(DB_PATH, echo=False)
         try:
             self.df = pd.read_sql(
-                "SELECT * FROM board_%s_%s" % (self.ID, type), con=engine)
+                "SELECT * FROM board_%s_%s" % (self.key, type), con=engine)
             return self.df
         except sqlalchemy.exc.OperationalError:
             return pd.DataFrame()

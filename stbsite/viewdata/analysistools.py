@@ -6,7 +6,7 @@ from .values import default_voltages
 
 def getBoard(board_id):
     boards = getBoards()
-    board = Board(boards.loc[boards.ID == str(board_id)].ID.values[0])
+    board = Board(boards.loc[boards.Key == str(board_id)].Key.values[0])
     return board
 
 
