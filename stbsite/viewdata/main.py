@@ -33,7 +33,7 @@ def getBoards():
     engine = sqlalchemy.create_engine(DB_PATH, echo=False)
     try:
         df = pd.read_sql("SELECT * FROM boards WHERE Deleted=0", con=engine)
-    except:
+    except Exception:
         df = pd.DataFrame([])
     return df
 

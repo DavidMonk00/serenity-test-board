@@ -11,7 +11,7 @@
 
 {% block nav-column %}
 {% if forloop.counter0|divisibleby:table_width %}
-<td><a href="/viewdata/boards/{{column}}">{{column}}</a></td>
+<td><a href="/viewdata/boards/{{row.key}}">{{column}}</a></td>
 {% else %}
 {% if forloop.counter|divisibleby:table_width %}
 {% else %}

@@ -1,21 +1,38 @@
 import numpy as np
+import pandas as pd
 from .board import Board
 from .main import getBoards
 from .values import default_voltages
 
 
-def getBoard(board_id):
+def getBoard(board_key):
     boards = getBoards()
-    board = Board(boards.loc[boards.Key == str(board_id)].Key.values[0])
+    board = Board(boards.loc[boards.Key == str(board_key)].Key.values[0])
     return board
 
 
-def displayDataTable(df):
-    context = {
-        'header': list(df.columns),
-        'table_width': len(list(df.columns)),
-        'results': df.values.tolist(),
-    }
+def displayDataTable(df, key_fmt=False):
+    if key_fmt:
+        try:
+            data = df.drop(columns=['Key']).values.tolist()
+            keys = df.Key.values.tolist()
+            context = {
+                'header': list(df.drop(columns=['Key']).columns),
+                'table_width': len(list(df.columns)) - 1,
+                'results': [{
+                    'data': data[i],
+                    'key': keys[i]} for i in range(len(data))]
+            }
+        except Exception as e:
+            context = {}
+    else:
+        context = {
+            'header': list(df.columns),
+            'table_width': len(list(df.columns)),
+            'results': [{
+                'data': i,
+                'key': '0'} for i in df.values.tolist()]
+        }
     return context
 
 

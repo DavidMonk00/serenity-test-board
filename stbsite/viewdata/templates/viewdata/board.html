@@ -12,7 +12,7 @@
         if (confirm('Are you sure you want to delete this board?')) {
             $.ajax({
                 method: "GET",
-                url: "/viewdata/delete-board?board_id={{board_id}}",
+                url: "/viewdata/delete-board?board_key={{board_key}}",
                 data: {},
                 success: function(data) {
                     window.location = '/viewdata/';
@@ -27,7 +27,7 @@
 {% endblock script %}
 
 {% block title %}
-<title>Board {{board_id}}</title>
+<title>Board {{board_key}}</title>
 {% endblock title %}
 
 {% block body %}
@@ -35,7 +35,7 @@
 <body>
     {% block nav-bar %}
     >> <a href="/viewdata/">Home</a>
-    >> <a href="/viewdata/boards/{{board_id}}">Board {{board_id}}</a>
+    >> <a href="/viewdata/boards/{{board_key}}">Board {{board_id}}</a>
     {% endblock nav-bar %}
     <h1>Serenity Test Card</h1>
     <h2>Board ID: {{board_id}}</h2>

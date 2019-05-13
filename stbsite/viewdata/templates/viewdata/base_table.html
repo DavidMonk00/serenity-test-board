@@ -11,7 +11,7 @@
     </thead>
     {% for row in results %}
     <tr>
-        {% for column in row %}
+        {% for column in row.data %}
             {% block nav-column %}
             <td>{{column}}</td>
             {% endblock nav-column %}

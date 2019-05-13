@@ -12,6 +12,14 @@ import numpy as np
 class Board:
     def __init__(self, key):
         self.key = key
+        engine = sqlalchemy.create_engine(DB_PATH, echo=False)
+        try:
+            boards = pd.read_sql(
+                "SELECT * FROM boards WHERE Deleted=0", con=engine)
+            boards = boards.set_index('Key')
+        except Exception:
+            boards = pd.DataFrame([])
+        self.ID = boards.loc[str(key)].ID
 
     def deleteBoard(self):
         engine = sqlalchemy.create_engine(DB_PATH, echo=False)

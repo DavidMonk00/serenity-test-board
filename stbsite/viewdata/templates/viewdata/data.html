@@ -6,18 +6,18 @@
 {% endblock style %}
 
 {% block title %}
-<title>Board {{board_id}} | {{timestring}}</title>
+<title>Board {{board_key}} | {{timestring}}</title>
 {% endblock title %}
 
 {% block body %}
 <body>
     {% block nav-bar %}
     >> <a href="/viewdata/">Home</a>
-    >> <a href="/viewdata/boards/{{board_id}}">Board {{board_id}}</a>
-    >> <a href="/viewdata/boards/{{board_id}}/data/{{timestring}}">{{timestring}}</a>
+    >> <a href="/viewdata/boards/{{board_key}}">Board {{board_key}}</a>
+    >> <a href="/viewdata/boards/{{board_key}}/data/{{timestring}}">{{timestring}}</a>
     {% endblock nav-bar %}
     <h1>Serenity Test Card</h1>
-    <h2>Board ID: {{board_id}}</h2>
+    <h2>Board ID: {{board_key}}</h2>
     <h3>Measurement taken: {{date_fmt}}</h3>
     {% include "viewdata/data_table.html" with results=results footer=footer header=header %}
 </body>

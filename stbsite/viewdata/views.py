@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 
 from datetime import datetime
+import numpy as np
 
 from .main import getBoards, createBoard
 from .databasing import viewTable
@@ -9,43 +10,50 @@ from .values import PATH
 from .diagnostics import Diagnostics
 from .analysistools import custom_strftime, displayDataTable, getBoard
 from .analysistools import getFooterStats
+from .board import Board as cBoard
 
 
 def index(request):
-    context = displayDataTable(getBoards())
+    context = displayDataTable(getBoards(), key_fmt=True)
     return render(request, 'viewdata/index.html', context)
 
 
-def board(request, board_id):
+def board(request, board_key):
+    board = cBoard(board_key)
     context = {}
     context['all'] = displayDataTable(
-        getBoard(board_id).listMeasurements('all'))
+        board.listMeasurements('all'))
     context['services'] = displayDataTable(
-        getBoard(board_id).listMeasurements('services'))
+        board.listMeasurements('services'))
     context['x0'] = displayDataTable(
-        getBoard(board_id).listMeasurements('x0'))
+        board.listMeasurements('x0'))
     context['x1'] = displayDataTable(
-        getBoard(board_id).listMeasurements('x1'))
-    context['board_id'] = board_id
+        board.listMeasurements('x1'))
+    context['board_id'] = board.ID
+    context['board_key'] = board_key
     return render(request, 'viewdata/board.html', context)
 
 
-def data(request, board_id, timestring, type):
+def data(request, board_key, timestring, type):
     context = {}
     date_fmt = datetime.strptime(timestring, '%Y%m%d%H%M%S')
     context['date_fmt'] = custom_strftime(
         '%A {S} %B %Y at %-I:%M:%S %p',
         date_fmt)
-    context['board_id'] = board_id
+    context['board_key'] = board_key
     context['timestring'] = timestring
     data = viewTable(
         PATH+'/data/db.sqlite',
-        "%d_%s_%s" % (board_id, type, timestring)
+        "%d_%s_%s" % (board_key, type, timestring)
     )
-    context['header'] = ['Measurement Number'] + data.columns.tolist()[1:]
-    context['results'] = data.values.tolist()
+    context['header'] = ['Measurement Number'] + data.columns.tolist()
+    context['results'] = [{'data': i} for i in np.insert(
+        data.values, 0, [j for j in range(len(data))], axis=1).tolist()]
+    for i in range(len(context['results'])):
+        context['results'][i]['data'][0] = int(
+            context['results'][i]['data'][0])
     context['table_width'] = len(list(data.columns))
-    context['footer'] = getFooterStats(data)
+    context['footer'] = [0] + getFooterStats(data)
     return render(request, 'viewdata/data.html', context)
 
 
@@ -67,9 +75,8 @@ def checkI2CStatus(request):
 
 
 def measure(request):
-    context = displayDataTable(getBoards())
+    context = displayDataTable(getBoards(), key_fmt=True)
     context['boards'] = getBoards().values
-    print(context)
     return render(request, 'viewdata/measure.html', context)
 
 
@@ -90,8 +97,8 @@ def submitNewBoard(request):
 
 
 def deleteBoard(request):
-    print(request.GET.get('board_id'))
-    board = getBoard(int(request.GET.get('board_id')))
+    print(request.GET.get('board_key'))
+    board = getBoard(int(request.GET.get('board_key')))
     board.deleteBoard()
     # metadata = [request.GET.get('version'), request.GET.get('timestring')]
     # createBoard(metadata)
