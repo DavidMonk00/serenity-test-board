@@ -6,15 +6,6 @@ const uint32_t I2C_RD = 0x01;
 /* I2C MUX */
 const uint32_t I2C_MUX_ADDR = 0xE0;
 
-const uint32_t I2C_MUX_CH0 = 0x01;
-const uint32_t I2C_MUX_CH1 = 0x02;
-const uint32_t I2C_MUX_CH2 = 0x04;
-const uint32_t I2C_MUX_CH3 = 0x08;
-const uint32_t I2C_MUX_CH4 = 0x10;
-const uint32_t I2C_MUX_CH5 = 0x20;
-const uint32_t I2C_MUX_CH6 = 0x40;
-const uint32_t I2C_MUX_CH7 = 0x80;
-
 /* ADC */
 const uint32_t ADC_ADDR  = 0x60;
 const float ADC_REF_V = 4.096; // adc reference in volt
