@@ -1,7 +1,7 @@
 #include "SerenityTestBoard.hpp"
 
 SerenityTestBoard::SerenityTestBoard(void) {
-    ftdi = new FT2232H(0x0403, 0x6010, FIFTY_KHZ, IFACE_A);
+    ftdi = new FT2232H(0x0403, 0x6010, ftdi::FIFTY_KHZ, ftdi::IFACE_A);
 }
 
 SerenityTestBoard::~SerenityTestBoard(void) {
