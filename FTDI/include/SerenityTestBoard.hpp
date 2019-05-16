@@ -1,21 +1,10 @@
 #pragma once
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-#include <unistd.h>
-#include <time.h>
-#include <iostream>
-#include <vector>
-#include <stdexcept>
-#include <cstring>
-#include <string>
 #include <unordered_map>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <utility>
+#include <cstring>
 
 #include "FT2232H.hpp"
 #include "consts.hpp"

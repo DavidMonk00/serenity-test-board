@@ -1,14 +1,9 @@
 #pragma once
 
-#include <stdio.h>
 #include <vector>
-#include <iostream>
 #include <stdexcept>
 #include <ftdi.h>
-#include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
-#include <unistd.h>
 
 
 namespace ftdi {
@@ -32,7 +27,7 @@ namespace ftdi {
 		SIX_MHZ 	 = 6000000,
 		TEN_MHZ		 = 10000000,
 		TWELVE_MHZ 	 = 12000000,
-		FIFTEEN_MHZ      = 15000000,
+		FIFTEEN_MHZ  = 15000000,
 		THIRTY_MHZ 	 = 30000000,
 		SIXTY_MHZ 	 = 60000000
 	};
@@ -78,13 +73,6 @@ namespace ftdi {
 	enum low_bits_status {
 		STARTED,
 		STOPPED
-	};
-
-	enum mpsse_commands {
-		DISABLE_ADAPTIVE_CLOCK  = 0x97,
-		ENABLE_3_PHASE_CLOCK	= 0x8C,
-		TCK_X5			= 0x8A,
-		TCK_D5			= 0x8B,
 	};
 
 	enum i2c_ack {

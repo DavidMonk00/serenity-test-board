@@ -1,11 +1,5 @@
 #pragma once
 
-/* C */
-#include <stdio.h>
-#include <stdlib.h>
-#include <vector>
-#include <stdexcept>
-
 #include "consts.hpp"
 #include "FT2232H.hpp"
 

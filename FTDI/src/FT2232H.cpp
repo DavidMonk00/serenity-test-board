@@ -1,6 +1,6 @@
 #include "FT2232H.hpp"
 
-FT2232H::FT2232H (int vid, int pid, int freq, int interface) {
+FT2232H::FT2232H (int vid, int pid, int freq, int interface) {    
     int status = 0;
     if(ftdi_init(&mFtdi) != 0) {
         throw std::runtime_error("Error: FT2232H not initialised");
@@ -138,10 +138,14 @@ void FT2232H::stop() {
 }
 
 void FT2232H::setClock(uint32_t freq) {
+    enum mpsse_commands {
+		TCK_X5			= 0x8A,
+		TCK_D5			= 0x8B,
+	};
 	uint32_t system_clock = 0;
 	uint16_t divisor = 0;
 	unsigned char buf[ftdi::CMD_SIZE] = { 0 };
-    buf[0] = (freq > ftdi::SIX_MHZ) ? ftdi::TCK_X5 : ftdi::TCK_D5;
+    buf[0] = (freq > ftdi::SIX_MHZ) ? TCK_X5 : TCK_D5;
     system_clock = (freq > ftdi::SIX_MHZ) ? ftdi::SIXTY_MHZ : ftdi::TWELVE_MHZ;
 	rawWrite(buf, 1);
     divisor = (freq <= 0) ? 0xFFFF : freqToDiv(system_clock, freq);
@@ -160,6 +164,11 @@ uint32_t FT2232H::divToFreq(uint32_t system_clock, uint16_t div) {
 }
 
 void FT2232H::setMode() {
+    enum mpsse_commands {
+		DISABLE_ADAPTIVE_CLOCK  = 0x97,
+		ENABLE_3_PHASE_CLOCK	= 0x8C,
+	};
+
 	int i = 0, setup_commands_size = 0;
 	unsigned char buf[ftdi::CMD_SIZE] = { 0 };
 	unsigned char setup_commands[ftdi::CMD_SIZE*ftdi::MAX_SETUP_COMMANDS] = { 0 };
@@ -182,7 +191,7 @@ void FT2232H::setMode() {
         setAck(ftdi::ACK);
     } catch (const std::runtime_error& error) {}
 	/* Ensure adaptive clock is disabled */
-	setup_commands[setup_commands_size++] = ftdi::DISABLE_ADAPTIVE_CLOCK;
+	setup_commands[setup_commands_size++] = DISABLE_ADAPTIVE_CLOCK;
 	/* I2C propogates data on the falling clock edge and reads data on the falling (or rising) clock edge */
 	mTx |= MPSSE_WRITE_NEG;
 	mRx &= ~MPSSE_READ_NEG;
@@ -193,7 +202,7 @@ void FT2232H::setMode() {
 	/* I2C stop bit == data line goes from low to high while clock line is high - set data line low here, so the transition to the idle state triggers the stop condition. */
 	mPstop &= ~ftdi::DO & ~ftdi::DI;
 	/* Enable three phase clock to ensure that I2C data is available on both the rising and falling clock edges */
-	setup_commands[setup_commands_size++] = ftdi::ENABLE_3_PHASE_CLOCK;
+	setup_commands[setup_commands_size++] = ENABLE_3_PHASE_CLOCK;
 	/* Send any setup commands to the chip */
 	if(setup_commands_size > 0) {
         rawWrite(setup_commands, setup_commands_size);
