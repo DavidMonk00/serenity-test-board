@@ -13,14 +13,14 @@ OBJECTS += $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(CXX_SOURCES:.$(CXX_SRCEXT)=.o)
 CFLAGS :=
 CXXFLAGS := -std=c++11
 FTDI_VERSION := $(shell find /usr/include/ -name "ftdi.h" | sed -e "s/\/usr\/include\///g")
+INC := -Iinclude
 ifeq ($(FTDI_VERSION), ftdi.h)
 	LIBFTDI := ftdi
-	INC := -Iinclude
 else
 	LIBFTDI := ftdi1
-	INC := -Iinclude -I/usr/include/libftdi1
+	INC += -I/usr/include/libftdi1
 endif
-LIB := -lm -l$(LIBFTDI)
+LIB := -l$(LIBFTDI)
 
 all: executable
 
