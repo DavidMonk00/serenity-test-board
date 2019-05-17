@@ -1,6 +1,67 @@
 #include "FT2232H.hpp"
 
-FT2232H::FT2232H (int vid, int pid, int freq, int interface) {    
+/* Common clock rates */
+enum clock_rates {
+    FIFTY_KHZ = 50000,
+    ONE_HUNDRED_KHZ  = 100000,
+    FOUR_HUNDRED_KHZ = 400000,
+    ONE_MHZ 	 = 1000000,
+    TWO_MHZ		 = 2000000,
+    FIVE_MHZ	 = 5000000,
+    SIX_MHZ 	 = 6000000,
+    TEN_MHZ		 = 10000000,
+    TWELVE_MHZ 	 = 12000000,
+    FIFTEEN_MHZ  = 15000000,
+    THIRTY_MHZ 	 = 30000000,
+    SIXTY_MHZ 	 = 60000000
+};
+
+const int MSB = 0x00;
+const int LSB = 0x08;
+const int CHUNK_SIZE = 65535;
+const int SPI_RW_SIZE = (63 * 1024);
+const int SPI_TRANSFER_SIZE = 512;
+const int I2C_TRANSFER_SIZE	= 64;
+const int I2C = 5;
+
+const int LATENCY_MS = 2;
+const int USB_TIMEOUT = 12e4;
+const int SETUP_DELAY = 25e3;
+
+const int CMD_SIZE = 3;
+const int MAX_SETUP_COMMANDS = 10;
+const int SS_TX_COUNT = 3;
+
+const int LOW = 0;
+const int HIGH = 1;
+const int NUM_GPIOL_PINS = 4;
+const int NUM_GPIO_PINS = 12;
+
+enum pins {
+	SK	= 1,
+	DO	= 2,
+	DI	= 4,
+	CS	= 8 ,
+	GPIO0	= 16,
+	GPIO1	= 32,
+	GPIO2	= 64,
+	GPIO3	= 128
+};
+
+const int DEFAULT_TRIS = (SK | DO | CS | GPIO0 | GPIO1 | GPIO2 | GPIO3);     /* SK/DO/CS and GPIOs are outputs, DI is an input */
+const int DEFAULT_PORT = (SK | CS);
+
+enum low_bits_status {
+	STARTED,
+	STOPPED
+};
+
+enum i2c_ack {
+	ACK  = 0,
+	NACK = 1
+};
+
+FT2232H::FT2232H (int vid, int pid, int freq, int interface) {
     int status = 0;
     if(ftdi_init(&mFtdi) != 0) {
         throw std::runtime_error("Error: FT2232H not initialised");
@@ -9,29 +70,29 @@ FT2232H::FT2232H (int vid, int pid, int freq, int interface) {
     if(ftdi_usb_open_desc_index(&mFtdi, vid, pid, NULL, NULL, 0) != 0) {
         throw std::runtime_error("Error: could not open usb port.");
     }
-	mStatus = ftdi::STOPPED;
-    mXsize = ftdi::I2C_TRANSFER_SIZE;
+	mStatus = STOPPED;
+    mXsize = I2C_TRANSFER_SIZE;
     status |= ftdi_usb_reset(&mFtdi);
-	status |= ftdi_set_latency_timer(&mFtdi, ftdi::LATENCY_MS);
-	status |= ftdi_write_data_set_chunksize(&mFtdi, ftdi::CHUNK_SIZE);
-	status |= ftdi_read_data_set_chunksize(&mFtdi, ftdi::CHUNK_SIZE);
-    status |= ftdi_set_bitmode(&mFtdi, 0, ftdi::BITMODE_RESET);
+	status |= ftdi_set_latency_timer(&mFtdi, LATENCY_MS);
+	status |= ftdi_write_data_set_chunksize(&mFtdi, CHUNK_SIZE);
+	status |= ftdi_read_data_set_chunksize(&mFtdi, CHUNK_SIZE);
+    status |= ftdi_set_bitmode(&mFtdi, 0, BITMODE_RESET);
     if(status != 0) {
         throw std::runtime_error("Error: ftdi configuration failed.");
     }
-    mFtdi.usb_read_timeout = ftdi::USB_TIMEOUT;
-    mFtdi.usb_write_timeout = ftdi::USB_TIMEOUT;
-    ftdi_set_bitmode(&mFtdi, 0, ftdi::BITMODE_MPSSE);
+    mFtdi.usb_read_timeout = USB_TIMEOUT;
+    mFtdi.usb_write_timeout = USB_TIMEOUT;
+    ftdi_set_bitmode(&mFtdi, 0, BITMODE_MPSSE);
     setClock(freq);
     setMode();
     mOpen = 1;
-    usleep(ftdi::SETUP_DELAY);
+    usleep(SETUP_DELAY);
     ftdi_usb_purge_buffers(&mFtdi);
 }
 
 FT2232H::~FT2232H () {
     if(mOpen) {
-        ftdi_set_bitmode(&mFtdi, 0, ftdi::BITMODE_RESET);
+        ftdi_set_bitmode(&mFtdi, 0, BITMODE_RESET);
         ftdi_usb_close(&mFtdi);
         ftdi_deinit(&mFtdi);
     }
@@ -43,11 +104,11 @@ void FT2232H::read(uint8_t addr, std::vector<uint8_t>& read_data) {
     }
     start();
     writeBytes((char*) &addr, 1);
-    if (getAck() != ftdi::ACK) {
+    if (getAck() != ACK) {
         throw std::runtime_error("ACK not received after writing address.");
     }
     for (unsigned int i = 0; i < read_data.size(); i++) {
-        (i < read_data.size() - 1) ? setAck(ftdi::ACK) : setAck(ftdi::NACK);
+        (i < read_data.size() - 1) ? setAck(ACK) : setAck(NACK);
         read_data[i] = (uint8_t)(*(readByte()));
     }
     stop();
@@ -59,7 +120,7 @@ void FT2232H::write(uint8_t addr, const std::vector<uint8_t>& write_data) {
     }
     start();
     writeBytes((char*) &addr, 1);
-    if (getAck() != ftdi::ACK) {
+    if (getAck() != ACK) {
         #ifdef DEBUG
         std::cout << "Address to be written: " << addr << '\n';
         #endif
@@ -67,7 +128,7 @@ void FT2232H::write(uint8_t addr, const std::vector<uint8_t>& write_data) {
     }
     for (unsigned int i = 0; i < write_data.size(); i++) {
         writeBytes((char*)&(write_data[i]), 1);
-        if (getAck() != ftdi::ACK) {
+        if (getAck() != ACK) {
             throw std::runtime_error("ACK not received after writing data.");
         }
     }
@@ -83,9 +144,9 @@ void FT2232H::setAck(int ack) {
     if (!mOpen) {
         throw std::runtime_error("Error setting ACK: context not open.");
     }
-    if(ack == ftdi::NACK) {
+    if(ack == NACK) {
         mTack = 0xFF;
-    } else if (ack == ftdi::ACK) {
+    } else if (ack == ACK) {
         mTack = 0x00;
     } else {
         throw std::runtime_error("Error setting ack: argument was neither ACK or NACK.");
@@ -98,18 +159,18 @@ int FT2232H::getAck() {
 
 void FT2232H::start() {
 	if (!mOpen) {
-        mStatus = ftdi::STOPPED;
+        mStatus = STOPPED;
         throw std::runtime_error("Error starting I2C: context not valid.");
     }
-	if(mStatus == ftdi::STARTED) {
+	if(mStatus == STARTED) {
 		/* Set the default pin states while the clock is low since this is an I2C repeated start condition */
-		setBitsLow(mPidle & ~ftdi::SK);
+		setBitsLow(mPidle & ~SK);
 		/* Make sure the pins are in their default idle state */
 		setBitsLow(mPidle);
 	}
 	/* Set the start condition */
 	setBitsLow(mPstart);
-	mStatus = ftdi::STARTED;
+	mStatus = STARTED;
 }
 
 void FT2232H::rawWrite(unsigned char *buf, int size) {
@@ -119,22 +180,22 @@ void FT2232H::rawWrite(unsigned char *buf, int size) {
 }
 
 void FT2232H::setBitsLow(int port) {
-	char buf[ftdi::CMD_SIZE] = {(char)SET_BITS_LOW, (char)port, (char)ftdi::DEFAULT_TRIS};
+	char buf[CMD_SIZE] = {(char)SET_BITS_LOW, (char)port, (char)DEFAULT_TRIS};
 	return rawWrite((unsigned char *) &buf, sizeof(buf));
 }
 
 void FT2232H::stop() {
 	if (!mOpen) {
-        mStatus = ftdi::STOPPED;
+        mStatus = STOPPED;
         throw std::runtime_error("Error stopping I2C: context not open.");
 	}
 	/* In I2C mode, we need to ensure that the data line goes low while the clock line is low to avoid sending an inadvertent start condition */
-	setBitsLow(mPidle & ~ftdi::DO & ~ftdi::SK);
+	setBitsLow(mPidle & ~DO & ~SK);
 	/* Send the stop condition */
 	setBitsLow(mPstop);
 	/* Restore the pins to their idle states */
 	setBitsLow(mPidle);
-	mStatus = ftdi::STOPPED;
+	mStatus = STOPPED;
 }
 
 void FT2232H::setClock(uint32_t freq) {
@@ -144,9 +205,9 @@ void FT2232H::setClock(uint32_t freq) {
 	};
 	uint32_t system_clock = 0;
 	uint16_t divisor = 0;
-	unsigned char buf[ftdi::CMD_SIZE] = { 0 };
-    buf[0] = (freq > ftdi::SIX_MHZ) ? TCK_X5 : TCK_D5;
-    system_clock = (freq > ftdi::SIX_MHZ) ? ftdi::SIXTY_MHZ : ftdi::TWELVE_MHZ;
+	unsigned char buf[CMD_SIZE] = { 0 };
+    buf[0] = (freq > SIX_MHZ) ? TCK_X5 : TCK_D5;
+    system_clock = (freq > SIX_MHZ) ? SIXTY_MHZ : TWELVE_MHZ;
 	rawWrite(buf, 1);
     divisor = (freq <= 0) ? 0xFFFF : freqToDiv(system_clock, freq);
 	buf[0] = TCK_DIVISOR;
@@ -170,16 +231,16 @@ void FT2232H::setMode() {
 	};
 
 	int i = 0, setup_commands_size = 0;
-	unsigned char buf[ftdi::CMD_SIZE] = { 0 };
-	unsigned char setup_commands[ftdi::CMD_SIZE*ftdi::MAX_SETUP_COMMANDS] = { 0 };
+	unsigned char buf[CMD_SIZE] = { 0 };
+	unsigned char setup_commands[CMD_SIZE*MAX_SETUP_COMMANDS] = { 0 };
 		/* Read and write commands need to include endianess */
 	mTx   = MPSSE_DO_WRITE | endianess;
 	mRx   = MPSSE_DO_READ  | endianess;
 	mTxRx = MPSSE_DO_WRITE | MPSSE_DO_READ | endianess;
 	/* Clock and chip select pins idle high; all others are low */
-	mPidle = mPstart = mPstop = ftdi::DEFAULT_PORT;
+	mPidle = mPstart = mPstop = DEFAULT_PORT;
 	/* During reads and writes the chip select pin is brought low */
-	mPstart &= ~ftdi::CS;
+	mPstart &= ~CS;
 	/* Disable FT2232H internal loopback */
     unsigned char loopback_buf[1] = { 0 };
 	if (mOpen) {
@@ -188,7 +249,7 @@ void FT2232H::setMode() {
 	}
 	/* Send ACKs by default */
     try {
-        setAck(ftdi::ACK);
+        setAck(ACK);
     } catch (const std::runtime_error& error) {}
 	/* Ensure adaptive clock is disabled */
 	setup_commands[setup_commands_size++] = DISABLE_ADAPTIVE_CLOCK;
@@ -196,11 +257,11 @@ void FT2232H::setMode() {
 	mTx |= MPSSE_WRITE_NEG;
 	mRx &= ~MPSSE_READ_NEG;
     /* In I2C, both the clock and the data lines idle high */
-	mPidle |= ftdi::DO | ftdi::DI;
+	mPidle |= DO | DI;
 	/* I2C start bit == data line goes from high to low while clock line is high */
-	mPstart &= ~ftdi::DO & ~ftdi::DI;
+	mPstart &= ~DO & ~DI;
 	/* I2C stop bit == data line goes from low to high while clock line is high - set data line low here, so the transition to the idle state triggers the stop condition. */
-	mPstop &= ~ftdi::DO & ~ftdi::DI;
+	mPstop &= ~DO & ~DI;
 	/* Enable three phase clock to ensure that I2C data is available on both the rising and falling clock edges */
 	setup_commands[setup_commands_size++] = ENABLE_3_PHASE_CLOCK;
 	/* Send any setup commands to the chip */
@@ -246,9 +307,9 @@ unsigned char *FT2232H::buildBlockBuffer(uint8_t cmd, unsigned char *data, int s
 		num_blocks++;
 	}
 	/* The total size of the data will be the data size + the write command */
-    total_size = size + (ftdi::CMD_SIZE * num_blocks);
+    total_size = size + (CMD_SIZE * num_blocks);
 	/* In I2C we have to add 3 additional commands per data block */
-	total_size += (ftdi::CMD_SIZE * 3 * num_blocks);
+	total_size += (CMD_SIZE * 3 * num_blocks);
     buf = (unsigned char*)malloc(total_size);
     if(!buf) {
         throw std::runtime_error("Error: buffer not initialied.");
@@ -263,12 +324,12 @@ unsigned char *FT2232H::buildBlockBuffer(uint8_t cmd, unsigned char *data, int s
 		rsize = dsize - 1;
 		/* For I2C we need to ensure that the clock pin is set low prior to clocking out data */
 		buf[i++] = SET_BITS_LOW;
-		buf[i++] = mPstart & ~ftdi::SK;
+		buf[i++] = mPstart & ~SK;
 		/* On receive, we need to ensure that the data out line is set as an input to avoid contention on the bus */
 		if(cmd == mRx) {
-			buf[i++] = ftdi::DEFAULT_TRIS & ~ftdi::DO;
+			buf[i++] = DEFAULT_TRIS & ~DO;
 		} else {
-			buf[i++] = ftdi::DEFAULT_TRIS;
+			buf[i++] = DEFAULT_TRIS;
 		}
 		/* Copy in the command for this block */
 		buf[i++] = cmd;
@@ -288,8 +349,8 @@ unsigned char *FT2232H::buildBlockBuffer(uint8_t cmd, unsigned char *data, int s
 		/* If we are receiving data, then we need to clock out an ACK for each byte */
 		if(cmd == mRx) {
 			buf[i++] = SET_BITS_LOW;
-			buf[i++] = mPstart & ~ftdi::SK;
-			buf[i++] = ftdi::DEFAULT_TRIS;
+			buf[i++] = mPstart & ~SK;
+			buf[i++] = DEFAULT_TRIS;
 			buf[i++] = mTx | MPSSE_BITMODE;
 			buf[i++] = 0;
 			buf[i++] = mTack;
@@ -298,8 +359,8 @@ unsigned char *FT2232H::buildBlockBuffer(uint8_t cmd, unsigned char *data, int s
 		else if(cmd == mTx) {
 			/* Need to make data out an input to avoid contention on the bus when the slave sends an ACK */
 			buf[i++] = SET_BITS_LOW;
-			buf[i++] = mPstart & ~ftdi::SK;
-			buf[i++] = ftdi::DEFAULT_TRIS & ~ftdi::DO;
+			buf[i++] = mPstart & ~SK;
+			buf[i++] = DEFAULT_TRIS & ~DO;
 
 			buf[i++] = mRx | MPSSE_BITMODE;
 			buf[i++] = 0;
@@ -321,7 +382,7 @@ void FT2232H::rawRead(unsigned char *buf, int size) {
 
 char *FT2232H::readByte(void) {
 	unsigned char *data = NULL, *buf = NULL;
-	unsigned char sbuf[ftdi::SPI_RW_SIZE] = { 0 };
+	unsigned char sbuf[SPI_RW_SIZE] = { 0 };
 	int rxsize = 0, data_size = 0;
 	if (!mOpen) {
         throw std::runtime_error("Error reading byte: context not open.");

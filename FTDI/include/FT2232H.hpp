@@ -33,62 +33,22 @@ namespace ftdi {
 		THIRTY_MHZ 	 = 30000000,
 		SIXTY_MHZ 	 = 60000000
 	};
+}
 
-	const int MSB = 0x00;
-	const int LSB = 0x08;
-	const int CHUNK_SIZE = 65535;
-	const int SPI_RW_SIZE = (63 * 1024);
-	const int SPI_TRANSFER_SIZE = 512;
-	const int I2C_TRANSFER_SIZE	= 64;
-	const int I2C = 5;
-
-	const int LATENCY_MS = 2;
-	const int USB_TIMEOUT = 12e4;
-	const int SETUP_DELAY = 25e3;
-
-	const int BITMODE_RESET	= 0;
-	const int BITMODE_MPSSE	= 2;
-
-	const int CMD_SIZE = 3;
-	const int MAX_SETUP_COMMANDS = 10;
-	const int SS_TX_COUNT = 3;
-
-	const int LOW = 0;
-	const int HIGH = 1;
-	const int NUM_GPIOL_PINS = 4;
-	const int NUM_GPIO_PINS = 12;
-
-	enum pins {
-		SK	= 1,
-		DO	= 2,
-		DI	= 4,
-		CS	= 8 ,
-		GPIO0	= 16,
-		GPIO1	= 32,
-		GPIO2	= 64,
-		GPIO3	= 128
-	};
-
-	const int DEFAULT_TRIS = (SK | DO | CS | GPIO0 | GPIO1 | GPIO2 | GPIO3);     /* SK/DO/CS and GPIOs are outputs, DI is an input */
-	const int DEFAULT_PORT = (SK | CS);
-
+class FT2232H {
+private:
+	static const int MSB = 0x00;
+	static const int LSB = 0x08;
+	static const int I2C = 5;
 	enum low_bits_status {
 		STARTED,
 		STOPPED
 	};
 
-	enum i2c_ack {
-		ACK  = 0,
-		NACK = 1
-	};
-}
-
-class FT2232H {
-private:
 	struct ftdi_context mFtdi;
-	enum ftdi::low_bits_status mStatus;
-    static const int mode = ftdi::I2C;
-    static const int endianess = ftdi::MSB;
+	enum low_bits_status mStatus;
+    static const int mode = I2C;
+    static const int endianess = MSB;
 	int mXsize;
 	int mOpen;
 	uint8_t mPstart;
