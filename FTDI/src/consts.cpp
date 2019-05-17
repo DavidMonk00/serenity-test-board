@@ -56,7 +56,7 @@ const char *MUX_LABLES[4][8] = {
     "X0_POWER_MGTAVTT_S"}
   };
 
-  const char *MUX_DISPLAY_LABLES[4][8] = {
+const char *MUX_DISPLAY_LABLES[4][8] = {
     { "X1_POWER_MGTVCCAUX_N        ",
       "X1_POWER_MGTAVTT_S          ",
       "X1_POWER_MGTAVCC_S          ",

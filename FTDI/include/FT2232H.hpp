@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <ftdi.h>
 #include <string.h>
+#include <iostream>
+#include <unistd.h>
 
 
 namespace ftdi {

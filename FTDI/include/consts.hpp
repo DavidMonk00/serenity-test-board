@@ -9,6 +9,8 @@
 extern const uint32_t I2C_WR;
 extern const uint32_t I2C_RD;
 
+extern const uint32_t I2C_MUX_ADDR;
+
 /* ADC */
 extern const uint32_t ADC_ADDR;
 extern const float ADC_REF_V; // adc reference in volt
