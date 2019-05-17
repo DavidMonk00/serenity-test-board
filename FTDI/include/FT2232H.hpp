@@ -37,9 +37,6 @@ namespace ftdi {
 
 class FT2232H {
 private:
-	static const int MSB = 0x00;
-	static const int LSB = 0x08;
-	static const int I2C = 5;
 	enum low_bits_status {
 		STARTED,
 		STOPPED
@@ -47,8 +44,7 @@ private:
 
 	struct ftdi_context mFtdi;
 	enum low_bits_status mStatus;
-    static const int mode = I2C;
-    static const int endianess = MSB;
+    static const int endianess = 0x00; // MSB = 0x00, LSB = 0x08
 	int mXsize;
 	int mOpen;
 	uint8_t mPstart;
@@ -68,7 +64,6 @@ private:
     void setBitsLow(int port);
     void setClock(uint32_t freq);
     uint16_t freqToDiv(uint32_t system_clock, uint32_t freq);
-    uint32_t divToFreq(uint32_t system_clock, uint16_t div);
     void setMode();
     void writeBytes(char *data, int size);
     unsigned char *buildBlockBuffer(uint8_t cmd, unsigned char *data, int size, int *buf_size);

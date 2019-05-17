@@ -1,28 +1,9 @@
 #include "FT2232H.hpp"
 
-/* Common clock rates */
-enum clock_rates {
-    FIFTY_KHZ = 50000,
-    ONE_HUNDRED_KHZ  = 100000,
-    FOUR_HUNDRED_KHZ = 400000,
-    ONE_MHZ 	 = 1000000,
-    TWO_MHZ		 = 2000000,
-    FIVE_MHZ	 = 5000000,
-    SIX_MHZ 	 = 6000000,
-    TEN_MHZ		 = 10000000,
-    TWELVE_MHZ 	 = 12000000,
-    FIFTEEN_MHZ  = 15000000,
-    THIRTY_MHZ 	 = 30000000,
-    SIXTY_MHZ 	 = 60000000
-};
-
-const int MSB = 0x00;
-const int LSB = 0x08;
 const int CHUNK_SIZE = 65535;
 const int SPI_RW_SIZE = (63 * 1024);
 const int SPI_TRANSFER_SIZE = 512;
 const int I2C_TRANSFER_SIZE	= 64;
-const int I2C = 5;
 
 const int LATENCY_MS = 2;
 const int USB_TIMEOUT = 12e4;
@@ -206,8 +187,8 @@ void FT2232H::setClock(uint32_t freq) {
 	uint32_t system_clock = 0;
 	uint16_t divisor = 0;
 	unsigned char buf[CMD_SIZE] = { 0 };
-    buf[0] = (freq > SIX_MHZ) ? TCK_X5 : TCK_D5;
-    system_clock = (freq > SIX_MHZ) ? SIXTY_MHZ : TWELVE_MHZ;
+    buf[0] = (freq > ftdi::SIX_MHZ) ? TCK_X5 : TCK_D5;
+    system_clock = (freq > ftdi::SIX_MHZ) ? ftdi::SIXTY_MHZ : ftdi::TWELVE_MHZ;
 	rawWrite(buf, 1);
     divisor = (freq <= 0) ? 0xFFFF : freqToDiv(system_clock, freq);
 	buf[0] = TCK_DIVISOR;
@@ -218,10 +199,6 @@ void FT2232H::setClock(uint32_t freq) {
 
 uint16_t FT2232H::freqToDiv(uint32_t system_clock, uint32_t freq) {
 	return (((system_clock / freq) / 2) - 1);
-}
-
-uint32_t FT2232H::divToFreq(uint32_t system_clock, uint16_t div) {
-	return (system_clock / ((1 + div) * 2));
 }
 
 void FT2232H::setMode() {
