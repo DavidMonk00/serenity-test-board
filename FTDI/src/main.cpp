@@ -182,7 +182,7 @@ int main(int argc, char** argv) {
 
     if (sweep_flag) {
         for (uint8_t addr = 0; addr < 0x100; addr++) {
-            std::cout << addr << '\n';
+            std::cout << (int)addr << '\n';
             try {
                 std::vector<uint8_t> rData;
                 rData.resize(ndata);
