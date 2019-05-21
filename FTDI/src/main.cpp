@@ -115,7 +115,7 @@ int main(int argc, char** argv) {
             label = optarg;
             break;
         case 'S':
-            services_flag = 1;
+            sweep_flag = 1;
             break;
         default:
             return 0;
@@ -181,7 +181,7 @@ int main(int argc, char** argv) {
     }
 
     if (sweep_flag) {
-        for (uint8_t addr = 0; addr < 0x100; adrr++) {
+        for (uint8_t addr = 0; addr < 0x100; addr++) {
             std::vector<uint8_t> rData;
             rData.resize(ndata);
             stb->ftdi->send(addr|I2C_RD, {}, rData);
