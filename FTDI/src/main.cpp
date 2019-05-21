@@ -181,7 +181,7 @@ int main(int argc, char** argv) {
     }
 
     if (sweep_flag) {
-        for (uint8_t addr = 0; addr < 0x100; addr++) {
+        for (uint8_t addr = 0; addr < 0xff; addr++) {
             std::cout << (int)addr << '\n';
             try {
                 std::vector<uint8_t> rData;
