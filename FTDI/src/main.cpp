@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
     int mux_index = 0;
     int channel_index = 0;
     int mux_label_flag = 0;
-    int services_flag = 0;
+    int sweep_flag = 0;
 
     char data = 0x00;
     int  ndata = 1; // numer of bytes to read
@@ -39,12 +39,12 @@ int main(int argc, char** argv) {
         {"mux"           , required_argument,  0, 'm'},
         {"channel"       , required_argument,  0, 'x'},
         {"label"         , required_argument,  0, 'L'},
-        {"services"      , no_argument,        0, 'S'},
+        {"sweep"         , no_argument,        0, 'S'},
         {0,0,0,0}
     };
 
     int optIndex = 0;
-    while ( (opt = getopt_long (argc, argv, "hrwa:d:n:clt:N:s:m:x:L:", longOptions, &optIndex) ) != -1 ) {
+    while ( (opt = getopt_long (argc, argv, "hrwa:d:n:clt:N:s:m:x:L:S", longOptions, &optIndex) ) != -1 ) {
 
         switch (opt)
         {
@@ -57,14 +57,14 @@ int main(int argc, char** argv) {
             printf( "d(--data  ) <data>: \t data to write (hex).\n" );
             printf( "n(--ndata ) <ndata>: \t number of data bytes to read (int).\n" );
             printf( "c(--adc   ) : \t returns the ADC conversion in V.\n" );
-            printf( "l(--all  ) : \t returns all the voltages on each mux.\n" );
+            printf( "l(--list  ) : \t returns all the voltages on each mux.\n" );
             printf( "t(--transmit): <port> \t will continuosly transmit data to <port>.\n" );
             printf( "N(--data-points): <npoints> \t number of points to loop through for each reading.\n" );
             printf( "s(--single) <label>: \t read mux of given label.\n" );
             printf( "m(--mux  ) <index>: \t Index of mux to select.\n" );
             printf( "x(--channel  ) <index>: \t Index of channel to select.\n" );
             printf( "L(--label) <label> \t configure muxes to select given label.\n");
-            printf( "S(--services ) : \t returns all the services voltages.\n" );
+            printf( "S(--sweep ) : \t returns all the services voltages.\n" );
             return 0;
             break;
         case 'r':
@@ -180,9 +180,17 @@ int main(int argc, char** argv) {
         stb->writeToFile(s_category);
     }
 
-    if (services_flag) {
-        stb->loopOverChannels(SERVICES_CHANNELS, npoints);
-        stb->writeToFile("services");
+    if (sweep_flag) {
+        for (uint8_t addr = 0; addr < 0x100; adrr++) {
+            std::vector<uint8_t> rData;
+            rData.resize(ndata);
+            stb->ftdi->send(addr|I2C_RD, {}, rData);
+            std::cout << addr << '\n';
+            printf("Reading operation done, data read:\n");
+            for(auto i : rData) {
+                printf("0x%x\n", i);
+            }
+        }
     }
 
     if (muxConfigFlag) stb->selectMuxChannel(mux_index, channel_index);
