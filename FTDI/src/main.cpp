@@ -182,14 +182,16 @@ int main(int argc, char** argv) {
 
     if (sweep_flag) {
         for (uint8_t addr = 0; addr < 0x100; addr++) {
-            std::vector<uint8_t> rData;
-            rData.resize(ndata);
-            stb->ftdi->send(addr|I2C_RD, {}, rData);
-            std::cout << addr << '\n';
-            printf("Reading operation done, data read:\n");
-            for(auto i : rData) {
-                printf("0x%x\n", i);
-            }
+            try {
+                std::vector<uint8_t> rData;
+                rData.resize(ndata);
+                stb->ftdi->send(addr|I2C_RD, {}, rData);
+                std::cout << addr << '\n';
+                printf("Reading operation done, data read:\n");
+                for(auto i : rData) {
+                    printf("0x%x\n", i);
+                }
+            } catch {}
         }
     }
 
