@@ -191,7 +191,7 @@ int main(int argc, char** argv) {
                 for(auto i : rData) {
                     printf("0x%x\n", i);
                 }
-            } catch {}
+            } catch (...) {}
         }
     }
 
